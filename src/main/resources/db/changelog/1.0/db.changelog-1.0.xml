@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-2.0.xsd">
+
+    <changeSet id="create-types-table" author="svallet">
+        <createTable tableName="types">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" />
+            </column>
+            <column name="name" type="VARCHAR(50)">
+                <constraints nullable="false" unique="true" uniqueConstraintName="type_name_ix1" />
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="create-nodes-table" author="svallet">
+        <createTable tableName="nodes">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" />
+            </column>
+            <column name="parent_id" type="BIGINT">
+                <constraints nullable="true" unique="false" uniqueConstraintName="nodes_parent_id_ix1" />
+            </column>
+            <column name="type_id" type="BIGINT">
+                <constraints nullable="false" foreignKeyName="fk_node_type" references="types(id)" />
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="create-tags-table" author="svallet">
+        <createTable tableName="tags">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" />
+            </column>
+            <column name="node_id" type="BIGINT">
+                <constraints nullable="false" foreignKeyName="fk_tags_node" references="nodes(id)" />
+            </column>
+            <column name="name" type="VARCHAR(50)">
+                <constraints nullable="false" unique="true" uniqueConstraintName="tags_name_ix1" />
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="create-properties-table" author="svallet">
+        <createTable tableName="properties">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" />
+            </column>
+            <column name="node_id" type="BIGINT">
+                <constraints nullable="false" foreignKeyName="fk_property_node" references="nodes(id)" />
+            </column>
+            <column name="property_name" type="VARCHAR(50)">
+                <constraints nullable="false" unique="true" uniqueConstraintName="property_name_ix1" />
+            </column>
+            <column name="string_val" type="VARCHAR(255)">
+                <constraints nullable="true" unique="false" uniqueConstraintName="string_val_ix1" />
+            </column>
+            <column name="serializable_val" type="BLOB">
+                <constraints nullable="true" unique="false" uniqueConstraintName="serializable_val_ix1" />
+            </column>
+            <column name="long_val" type="BIGINT">
+                <constraints nullable="true" unique="false" uniqueConstraintName="long_val_ix1" />
+            </column>
+            <column name="double_val" type="FLOAT">
+                <constraints nullable="true" unique="false" uniqueConstraintName="double_val_ix1" />
+            </column>
+            <column name="date_val" type="TIMESTAMP">
+                <constraints nullable="true" unique="false" uniqueConstraintName="date_val_ix1" />
+            </column>
+        </createTable>
+    </changeSet>
+
+</databaseChangeLog>

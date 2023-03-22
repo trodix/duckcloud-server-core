@@ -1,0 +1,23 @@
+version: '3.9'
+
+services:
+  postgres_duckcloud:
+    image: postgres:15.0
+    environment:
+      POSTGRES_DB: duckcloud
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - 5433:5432
+    networks:
+      - duckcloud-network
+    volumes:
+      - duckcloud_postgres_data:/var/lib/postgresql/data
+
+networks:
+  duckcloud-network:
+    driver: bridge
+
+volumes:
+  duckcloud_postgres_data:
+    external: false
