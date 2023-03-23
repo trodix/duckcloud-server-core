@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.trodix.duckcloud.core.persistance.dao.mappers.TagMapper">
+
+    <resultMap id="result_Tag" type="Tag">
+        <result property="id" column="tag_id" jdbcType="BIGINT" javaType="java.lang.Long" />
+        <result property="name" column="tag_name" jdbcType="VARCHAR" javaType="java.lang.String" />
+    </resultMap>
+
+    <select id="findOne" resultMap="result_Tag">
+        SELECT t.id as tag_id, t.name as tag_name FROM tags t WHERE t.id = #{id}
+    </select>
+
+    <select id="findAll" resultMap="result_Tag">
+        SELECT t.id as tag_id, t.name as tag_name FROM tags t
+    </select>
+
+    <insert id="insert" useGeneratedKeys="true">
+        INSERT INTO tags (name) VALUES (#{name})
+    </insert>
+
+    <update id="update">
+        UPDATE tags SET name = #{name}
+    </update>
+
+    <delete id="delete">
+        DELETE FROM tags t WHERE t.id = #{id}
+    </delete>
+
+</mapper>

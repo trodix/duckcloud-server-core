@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.trodix.duckcloud.core.persistance.dao.mappers.NodeMapper">
+
+    <insert id="insertNode" useGeneratedKeys="true">
+        INSERT INTO nodes
+        (
+            parent_id, type_id
+        )
+        VALUES
+        (
+            #{parentId}, #{typeId}
+        )
+    </insert>
+
+</mapper>

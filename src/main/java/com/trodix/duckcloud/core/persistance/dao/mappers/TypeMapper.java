@@ -9,14 +9,14 @@ import java.util.List;
 public interface TypeMapper {
 
     @Select("SELECT * FROM types WHERE id = #{id}")
-    Type getType(@Param("id") Long id);
+    Type findOne(@Param("id") Long id);
 
     @Select("SELECT * FROM types")
-    List<Type> getAllTypes();
+    List<Type> findAll();
 
     @Insert("INSERT INTO types (name) VALUES (#{name})")
     @Options(useGeneratedKeys = true, keyProperty = "id")
-    void insert(Type data);
+    void insert(Type type);
 
     @Update("UPDATE types SET name = #{name} WHERE ID = #{id}")
     void update(Type type);

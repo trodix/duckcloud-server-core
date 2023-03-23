@@ -16,11 +16,11 @@ public class TypeService {
     private final TypeMapper typeMapper;
 
     public Type getType(Long id) {
-        return typeMapper.getType(id);
+        return typeMapper.findOne(id);
     }
 
     public List<Type> getAllTypes() {
-        return typeMapper.getAllTypes();
+        return typeMapper.findAll();
     }
 
     public void createType(Type type) {
