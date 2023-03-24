@@ -4,15 +4,15 @@ import com.trodix.duckcloud.core.business.services.NodeService;
 import com.trodix.duckcloud.core.persistance.entities.Node;
 import com.trodix.duckcloud.core.presentation.dto.mappers.NodeMapper;
 import com.trodix.duckcloud.core.presentation.dto.requests.NodeRequest;
+import com.trodix.duckcloud.core.presentation.dto.responses.NodeResponse;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
-@RequestMapping("/api/v1")
+@RequestMapping("/api/v1/nodes")
 @AllArgsConstructor
 @Slf4j
 public class NodeController {
@@ -21,11 +21,38 @@ public class NodeController {
 
     private final NodeMapper nodeMapper;
 
-    @PostMapping("/nodes")
-    public void createNode(@RequestBody NodeRequest request) {
+    @GetMapping("/{id}")
+    public NodeResponse getOne(@PathVariable Long id) {
+        Node result = nodeService.getOne(id);
+        NodeResponse response = nodeMapper.toDto(result);
+        return response;
+    }
+
+    @GetMapping("")
+    public List<NodeResponse> getAll() {
+        List<Node> result = nodeService.getAll();
+        List<NodeResponse> response = nodeMapper.toDto(result);
+        return response;
+    }
+
+    @PostMapping("")
+    public void create(@RequestBody NodeRequest request) {
 
         final Node data = nodeMapper.toEntity(request);
-        nodeService.createNode(data);
+        nodeService.create(data);
+    }
+
+    @PutMapping("/{id}")
+    public void update(@PathVariable Long id, @RequestBody NodeRequest request) {
+
+        final Node data = nodeMapper.toEntity(request);
+        data.setId(id);
+        nodeService.update(data);
+    }
+
+    @DeleteMapping("/{id}")
+    public void delete(@PathVariable Long id) {
+        nodeService.delete(id);
     }
 
 }

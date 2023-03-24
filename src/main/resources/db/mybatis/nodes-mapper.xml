@@ -4,7 +4,29 @@
 
 <mapper namespace="com.trodix.duckcloud.core.persistance.dao.mappers.NodeMapper">
 
-    <insert id="insertNode" useGeneratedKeys="true">
+    <resultMap id="result_Node" type="Node">
+        <result property="id" column="n_id" jdbcType="BIGINT" javaType="java.lang.Long" />
+        <result property="parentId" column="n_parent_id" jdbcType="BIGINT" />
+        <result property="typeId" column="n_type_id" jdbcType="BIGINT" />
+    </resultMap>
+
+    <sql id="fields_Node">
+        n.id as n_id, n.parent_id as n_parent_id, n.type_id as n_type_id
+    </sql>
+
+    <sql id="select_node">
+        SELECT <include refid="fields_Node" /> FROM nodes n
+    </sql>
+
+    <select id="findOne" resultMap="result_Node">
+        <include refid="select_node" /> WHERE n.id = #{id}
+    </select>
+
+    <select id="findAll" resultMap="result_Node">
+        <include refid="select_node" />
+    </select>
+
+    <insert id="insert" useGeneratedKeys="true">
         INSERT INTO nodes
         (
             parent_id, type_id
@@ -14,5 +36,13 @@
             #{parentId}, #{typeId}
         )
     </insert>
+
+    <update id="update">
+        UPDATE nodes SET parent_id = #{parentId}, type_id = #{typeId} WHERE id = #{id}
+    </update>
+
+    <delete id="delete">
+        DELETE FROM nodes WHERE id = #{id}
+    </delete>
 
 </mapper>

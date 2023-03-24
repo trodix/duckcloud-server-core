@@ -4,15 +4,51 @@
 
 <mapper namespace="com.trodix.duckcloud.core.persistance.dao.mappers.PropertyMapper">
 
-    <insert id="insertProperty" useGeneratedKeys="true">
+    <resultMap id="result_Property" type="Property">
+        <result property="id" column="p_id" jdbcType="BIGINT" javaType="java.lang.Long" />
+        <result property="propertyName" column="p_property_name" jdbcType="VARCHAR" javaType="java.lang.String" />
+        <result property="stringVal" column="p_string_val" jdbcType="VARCHAR" javaType="java.lang.String" />
+        <result property="longVal" column="p_long_val" jdbcType="BIGINT" javaType="java.lang.Long" />
+        <result property="doubleVal" column="p_double_val" jdbcType="FLOAT" javaType="java.lang.Double" />
+        <result property="dateVal" column="p_date_val" jdbcType="TIMESTAMP" javaType="java.time.OffsetDateTime" />
+    </resultMap>
+
+    <sql id="fields_Property">
+        p_node_id, p_property_name, p_string_val, p_long_val, p_double_val, p_date_val
+    </sql>
+
+    <sql id="select_Property">
+        SELECT <include refid="fields_Property" /> FROM properties p
+    </sql>
+
+    <select id="findOne" resultMap="result_Property">
+        <include refid="select_Property" />
+        WHERE p.id = #{id}
+    </select>
+
+    <select id="findAll" resultMap="result_Property">
+        <include refid="select_Property" />
+    </select>
+
+    <insert id="insert" useGeneratedKeys="true">
         INSERT INTO properties
         (
-            node_id, property_name, string_val, serializable_val, long_val, double_val, date_val
+            node_id, property_name, string_val, long_val, double_val, date_val
         )
         VALUES
         (
-            #{parent_id}, #{type_id}
+            ${node_id}, #{property_name}, #{string_val}, #{long_val}, #{double_val}, #{date_val}
         )
     </insert>
+
+    <update id="update">
+        UPDATE properties SET node_id= ${node_id}, property_name = #{property_name}, string_val = #{string_val},
+        long_val = #{long_val}, double_val = #{double_val}, date_val = #{date_val}
+        WHERE id = #{id}
+    </update>
+
+    <delete id="delete">
+        DELETE FROM properties WHERE id = #{id}
+    </delete>
 
 </mapper>

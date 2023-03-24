@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/v1")
+@RequestMapping("/api/v1/types")
 @AllArgsConstructor
 @Slf4j
 public class TypeController {
@@ -20,24 +20,24 @@ public class TypeController {
 
     private final TypeMapper typeMapper;
 
-    @GetMapping("/types")
+    @GetMapping("")
     public List<Type> getAllTypes() {
         return typeService.getAllTypes();
     }
 
-    @GetMapping("/types/{id}")
+    @GetMapping("/{id}")
     public Type getType(@PathVariable Long id) {
         return typeService.getType(id);
     }
 
-    @PostMapping("/types")
+    @PostMapping("")
     public void createType(@RequestBody TypeRequest request) {
 
         final Type data = typeMapper.toEntity(request);
         typeService.createType(data);
     }
 
-    @PutMapping("/types/{id}")
+    @PutMapping("/{id}")
     public void updateType(@PathVariable Long id, @RequestBody TypeRequest request) {
 
         final Type data = typeMapper.toEntity(request);
@@ -46,7 +46,7 @@ public class TypeController {
         typeService.updateType(data);
     }
 
-    @DeleteMapping("/types/{id}")
+    @DeleteMapping("/{id}")
     public void deleteType(@PathVariable Long id) {
 
         typeService.deleteType(id);

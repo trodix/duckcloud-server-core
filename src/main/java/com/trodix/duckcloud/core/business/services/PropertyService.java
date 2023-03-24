@@ -14,7 +14,7 @@ public class PropertyService {
     private final PropertyMapper propertyMapper;
 
     public void createProperty(Property property) {
-        propertyMapper.insertProperty(property);
+        propertyMapper.insert(property);
     }
 
 }

@@ -16,8 +16,6 @@ public class Property {
 
     private String stringVal;
 
-    private Serializable serializableVal;
-
     private Long longVal;
 
     private Double doubleVal;

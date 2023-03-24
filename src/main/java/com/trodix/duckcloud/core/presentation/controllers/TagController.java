@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/v1")
+@RequestMapping("/api/v1/tags")
 @AllArgsConstructor
 @Slf4j
 public class TagController {
@@ -21,37 +21,37 @@ public class TagController {
 
     private final TagMapper tagMapper;
 
-    @GetMapping("/tags/{id}")
-    public TagResponse findOneTag(@PathVariable Long id) {
+    @GetMapping("/{id}")
+    public TagResponse getOne(@PathVariable Long id) {
         Tag result = tagService.findOneTag(id);
         TagResponse response = tagMapper.toDto(result);
         return response;
     }
 
-    @GetMapping("/tags")
-    public List<TagResponse> findAllTags() {
+    @GetMapping("")
+    public List<TagResponse> getAll() {
         List<Tag> result = tagService.findAllTags();
         List<TagResponse> response = tagMapper.toDto(result);
         return response;
     }
 
-    @PostMapping("/tags")
-    public void createTag(@RequestBody TagRequest request) {
+    @PostMapping("")
+    public void create(@RequestBody TagRequest request) {
 
         final Tag data = tagMapper.toEntity(request);
         tagService.createTag(data);
     }
 
-    @PutMapping("/tags/{id}")
-    public void updateTag(@PathVariable Long id, @RequestBody TagRequest request) {
+    @PutMapping("/{id}")
+    public void update(@PathVariable Long id, @RequestBody TagRequest request) {
 
         final Tag data = tagMapper.toEntity(request);
         data.setId(id);
         tagService.updateTag(data);
     }
 
-    @DeleteMapping("/tags/{id}")
-    public void updateTag(@PathVariable Long id) {
+    @DeleteMapping("/{id}")
+    public void delete(@PathVariable Long id) {
         tagService.deleteTag(id);
     }
 
