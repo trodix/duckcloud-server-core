@@ -9,8 +9,16 @@
         <result property="name" column="tag_name" jdbcType="VARCHAR" javaType="java.lang.String" />
     </resultMap>
 
+    <sql id="fields_Tag">
+        t.id as tag_id, t.name as tag_name
+    </sql>
+
+    <sql id="select_Tag">
+        SELECT <include refid="fields_Tag" /> FROM tags t
+    </sql>
+
     <select id="findOne" resultMap="result_Tag">
-        SELECT t.id as tag_id, t.name as tag_name FROM tags t WHERE t.id = #{id}
+        <include refid="select_Tag" /> WHERE t.id = #{id}
     </select>
 
     <select id="findAll" resultMap="result_Tag">

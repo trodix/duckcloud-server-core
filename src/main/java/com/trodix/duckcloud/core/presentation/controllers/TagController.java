@@ -22,16 +22,16 @@ public class TagController {
     private final TagMapper tagMapper;
 
     @GetMapping("/{id}")
-    public TagResponse getOne(@PathVariable Long id) {
+    public String getOne(@PathVariable Long id) {
         Tag result = tagService.findOneTag(id);
-        TagResponse response = tagMapper.toDto(result);
+        String response = tagMapper.toDto(result);
         return response;
     }
 
     @GetMapping("")
-    public List<TagResponse> getAll() {
+    public List<String> getAll() {
         List<Tag> result = tagService.findAllTags();
-        List<TagResponse> response = tagMapper.toDto(result);
+        List<String> response = tagMapper.toDto(result);
         return response;
     }
 

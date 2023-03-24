@@ -2,6 +2,8 @@ package com.trodix.duckcloud.core.persistance.entities;
 
 import lombok.Data;
 
+import java.util.List;
+
 @Data
 public class Node {
 
@@ -9,6 +11,10 @@ public class Node {
 
     private Long parentId;
 
-    private Long typeId;
+    private Type type;
+
+    private List<Tag> tags;
+
+    private List<Property> properties;
 
 }

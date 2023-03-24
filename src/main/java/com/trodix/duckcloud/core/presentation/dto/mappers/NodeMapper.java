@@ -7,8 +7,8 @@ import org.mapstruct.Mapper;
 
 import java.util.List;
 
-@Mapper
-public interface NodeMapper {
+@Mapper(uses = {TypeMapper.class, TagMapper.class, PropertyMapper.class})
+public interface NodeMapper  {
 
     Node toEntity(NodeRequest request);
 

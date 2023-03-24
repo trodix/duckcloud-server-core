@@ -7,7 +7,22 @@
     <resultMap id="result_Node" type="Node">
         <result property="id" column="n_id" jdbcType="BIGINT" javaType="java.lang.Long" />
         <result property="parentId" column="n_parent_id" jdbcType="BIGINT" />
-        <result property="typeId" column="n_type_id" jdbcType="BIGINT" />
+        <association property="type" javaType="Type">
+            <id property="id" column="ty_id" />
+            <result property="name" column="ty_name" />
+        </association>
+        <collection property="tags" ofType="Tag">
+            <id property="id" column="tag_id" />
+            <result property="name" column="tag_name" />
+        </collection>
+        <collection property="properties" ofType="Property">
+            <id property="id" column="p_id" />
+            <result property="propertyName" column="p_property_name" />
+            <result property="stringVal" column="p_string_val" />
+            <result property="longVal" column="p_long_val" />
+            <result property="doubleVal" column="p_double_val" />
+            <result property="dateVal" column="p_date_val" />
+        </collection>
     </resultMap>
 
     <sql id="fields_Node">
@@ -15,7 +30,18 @@
     </sql>
 
     <sql id="select_node">
-        SELECT <include refid="fields_Node" /> FROM nodes n
+        SELECT
+            <include refid="fields_Node" />,
+            ty.id as ty_id, ty.name as ty_name,
+            t.id as tag_id, t.name as tag_name,
+            p.id as p_id, p.node_id as p_node_id, p.property_name as p_property_name,
+            p.string_val as p_string_val, p.long_val as p_long_val, p.double_val as p_double_val,
+            p.date_val as p_date_val
+        FROM nodes n
+        LEFT JOIN types ty ON ty.id = n.type_id
+        LEFT JOIN node_tag nt ON nt.node_id = n.id
+        LEFT JOIN tags t ON t.id = nt.tag_id
+        LEFT JOIN properties p ON n.id = p.node_id
     </sql>
 
     <select id="findOne" resultMap="result_Node">

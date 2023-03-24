@@ -12,8 +12,10 @@ public interface TagMapper {
 
     Tag toEntity(TagRequest request);
 
-    TagResponse toDto(Tag tag);
+    default String toDto(Tag tag) {
+        return tag.getName();
+    }
 
-    List<TagResponse> toDto(List<Tag> tags);
+    List<String> toDto(List<Tag> tags);
 
 }

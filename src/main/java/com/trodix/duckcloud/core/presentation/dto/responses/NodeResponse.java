@@ -12,9 +12,9 @@ public class NodeResponse {
 
     private Long parentId;
 
-    private TypeResponse type;
+    private String type;
 
-    private List<TagResponse> tags;
+    private List<String> tags;
 
     private List<PropertyResponse> properties;
 
