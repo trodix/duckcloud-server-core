@@ -2,6 +2,7 @@ package com.trodix.duckcloud.core.presentation.controllers;
 
 import com.trodix.duckcloud.core.business.services.NodeService;
 import com.trodix.duckcloud.core.persistance.entities.Node;
+import com.trodix.duckcloud.core.persistance.entities.TreeNode;
 import com.trodix.duckcloud.core.presentation.dto.mappers.NodeMapper;
 import com.trodix.duckcloud.core.presentation.dto.requests.NodeRequest;
 import com.trodix.duckcloud.core.presentation.dto.responses.NodeResponse;
@@ -34,6 +35,11 @@ public class NodeController {
         List<Node> result = nodeService.getAll();
         List<NodeResponse> response = nodeMapper.toDto(result);
         return response;
+    }
+
+    @GetMapping("/tree/{parentId}")
+    public List<TreeNode> getTree(@PathVariable Long parentId) {
+        return nodeService.buildTreeFromParent(parentId);
     }
 
     @PostMapping("")

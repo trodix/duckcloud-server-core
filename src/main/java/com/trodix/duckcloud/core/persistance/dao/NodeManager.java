@@ -4,10 +4,7 @@ import com.trodix.duckcloud.core.persistance.dao.mappers.NodeMapper;
 import com.trodix.duckcloud.core.persistance.dao.mappers.PropertyMapper;
 import com.trodix.duckcloud.core.persistance.dao.mappers.TagMapper;
 import com.trodix.duckcloud.core.persistance.dao.mappers.TypeMapper;
-import com.trodix.duckcloud.core.persistance.entities.Node;
-import com.trodix.duckcloud.core.persistance.entities.Property;
-import com.trodix.duckcloud.core.persistance.entities.Tag;
-import com.trodix.duckcloud.core.persistance.entities.Type;
+import com.trodix.duckcloud.core.persistance.entities.*;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
@@ -68,6 +65,10 @@ public class NodeManager {
 
     public List<Node> findAll() {
         return nodeMapper.findAll();
+    }
+
+    public List<TreeNode> buildTreeFromParent(Long parentId) {
+        return nodeMapper.findTreeNodesByParentId(parentId);
     }
 
     public List<Tag> findSavedTagsForNode(Node node) {

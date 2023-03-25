@@ -25,6 +25,13 @@
         </collection>
     </resultMap>
 
+    <resultMap id="result_TreeNode" type="TreeNode">
+        <result property="nodeId" column="id" />
+        <result property="parentId" column="parent_id" />
+        <result property="nodeLevel" column="node_level" />
+        <result property="nodePath" column="node_path" />
+    </resultMap>
+
     <sql id="fields_Node">
         n.id as n_id, n.parent_id as n_parent_id, n.type_id as n_type_id
     </sql>
@@ -50,6 +57,29 @@
 
     <select id="findAll" resultMap="result_Node">
         <include refid="select_node" />
+    </select>
+
+    <select id="findTreeNodesByParentId" resultMap="result_TreeNode">
+        WITH RECURSIVE node_result as (
+            SELECT
+                n1.id,
+                n1.parent_id,
+                0 as node_level,
+                n1.id::VARCHAR as node_path
+            FROM nodes n1
+                WHERE n1.id = #{parentId}
+
+            UNION ALL
+
+            SELECT
+                n2.id,
+                n2.parent_id,
+                node_level+1,
+                node_path::VARCHAR || ',' || n2.id::VARCHAR
+            FROM nodes n2
+            JOIN node_result ntr on ntr.id = n2.parent_id
+
+        ) SELECT * FROM node_result;
     </select>
 
     <insert id="insert" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
