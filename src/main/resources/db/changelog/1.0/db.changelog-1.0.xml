@@ -84,4 +84,10 @@
         <addUniqueConstraint tableName="properties" columnNames="node_id, property_name" constraintName="property_name_ix1" />
     </changeSet>
 
+    <changeSet id="add-default-types" author="svallet">
+        <loadData file="db/changelog/1.0/data/app_types_1.0.csv" separator=";" tableName="types">
+            <column header="name" name="name" type="STRING"/>
+        </loadData>
+    </changeSet>
+
 </databaseChangeLog>
