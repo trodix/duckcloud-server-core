@@ -67,6 +67,10 @@ public class NodeManager {
         return nodeMapper.findAll();
     }
 
+    public List<Node> findAllByNodeId(List<Long> ids) {
+        return nodeMapper.findAllByNodeId(ids);
+    }
+
     public List<TreeNode> buildTreeFromParent(Long parentId) {
         return nodeMapper.findTreeNodesByParentId(parentId);
     }

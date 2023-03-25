@@ -28,6 +28,24 @@ public class NodeService {
     public List<TreeNode> buildTreeFromParent(Long parentId) {
         List<TreeNode> treeNodeList = nodeManager.buildTreeFromParent(parentId);
 
+        // associate node properties to tree items
+        List<Long> nodeIdsInTree = treeNodeList.stream().map(n -> n.getNodeId()).toList();
+        List<Node> nodeList = nodeManager.findAllByNodeId(nodeIdsInTree);
+
+        nodeList.forEach(node -> {
+            treeNodeList.stream()
+                    .filter(treeNode -> treeNode.getNodeId() == node.getId())
+                    .findAny()
+                    .ifPresent(nodeTree -> {
+                        nodeTree.setName(
+                                node.getProperties().stream()
+                                        .filter(p -> p.getPropertyName().equals("cm:name")).findAny().get().getStringVal());
+
+                        nodeTree.setType(node.getType().getName());
+                    });
+        });
+
+        // build nested tree
         final List<TreeNode> copyList = new ArrayList<>(treeNodeList);
 
         copyList.forEach(element -> {

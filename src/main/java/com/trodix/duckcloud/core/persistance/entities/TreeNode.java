@@ -16,6 +16,10 @@ public class TreeNode {
 
     private Integer nodeLevel;
 
+    private String type;
+
+    private String name;
+
     private List<String> nodePath;
 
     private List<TreeNode> children = new ArrayList<>();

@@ -82,6 +82,14 @@
         ) SELECT * FROM node_result;
     </select>
 
+    <select id="findAllByNodeId" resultMap="result_Node">
+        <include refid="select_node" />
+        WHERE n.id IN
+        <foreach collection="ids" item="node_id" index="index" open="(" separator="," close=")">
+            #{node_id}
+        </foreach>
+    </select>
+
     <insert id="insert" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
         INSERT INTO nodes
         (

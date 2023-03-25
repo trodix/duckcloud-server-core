@@ -16,6 +16,8 @@ public interface NodeMapper {
 
     List<TreeNode> findTreeNodesByParentId(Long parentId);
 
+    List<Node> findAllByNodeId(List<Long> ids);
+
     void insert(Node node);
 
     void insertNodeTagAssociation(@Param("nodeId") Long nodeId, @Param("tagId") Long tagId);
