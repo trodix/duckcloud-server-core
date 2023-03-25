@@ -1,4 +1,4 @@
-package com.trodix.duckcloud.core.config.security.converters;
+package com.trodix.duckcloud.core.presentation.security.converters;
 
 import com.nimbusds.jose.shaded.gson.JsonObject;
 import com.nimbusds.jose.shaded.gson.internal.LinkedTreeMap;

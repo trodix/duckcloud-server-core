@@ -1,4 +1,4 @@
-package com.trodix.duckcloud.core.config.security.utils;
+package com.trodix.duckcloud.core.presentation.security.utils;
 
 public enum Claims {
     EMAIL("email"),

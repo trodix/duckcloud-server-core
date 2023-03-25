@@ -1,13 +1,12 @@
-package com.trodix.duckcloud.core.config.security;
+package com.trodix.duckcloud.core.presentation.security;
 
 import java.util.Arrays;
 
-import com.trodix.duckcloud.core.config.security.converters.KeycloakJwtAuthenticationConverter;
+import com.trodix.duckcloud.core.presentation.security.converters.KeycloakJwtAuthenticationConverter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Scope;
-import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.core.context.SecurityContextHolder;

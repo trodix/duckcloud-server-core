@@ -1,7 +1,7 @@
-package com.trodix.duckcloud.core.config.security.services;
+package com.trodix.duckcloud.core.presentation.security.services;
 
-import com.trodix.duckcloud.core.config.security.exceptions.InvalidUserException;
-import com.trodix.duckcloud.core.config.security.utils.Claims;
+import com.trodix.duckcloud.core.presentation.security.exceptions.InvalidUserException;
+import com.trodix.duckcloud.core.presentation.security.utils.Claims;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.context.SecurityContextHolder;

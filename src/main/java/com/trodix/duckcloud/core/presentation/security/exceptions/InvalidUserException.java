@@ -1,4 +1,4 @@
-package com.trodix.duckcloud.core.config.security.exceptions;
+package com.trodix.duckcloud.core.presentation.security.exceptions;
 
 public class InvalidUserException extends RuntimeException {
 
