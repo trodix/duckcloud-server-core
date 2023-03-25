@@ -1,4 +1,4 @@
-package com.trodix.duckcloud.core.business.services;
+package com.trodix.duckcloud.core.domain.services;
 
 import com.trodix.duckcloud.core.persistance.dao.mappers.TypeMapper;
 import com.trodix.duckcloud.core.persistance.entities.Type;

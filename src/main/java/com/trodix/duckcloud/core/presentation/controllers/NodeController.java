@@ -1,6 +1,6 @@
 package com.trodix.duckcloud.core.presentation.controllers;
 
-import com.trodix.duckcloud.core.business.services.NodeService;
+import com.trodix.duckcloud.core.domain.services.NodeService;
 import com.trodix.duckcloud.core.persistance.entities.Node;
 import com.trodix.duckcloud.core.persistance.entities.TreeNode;
 import com.trodix.duckcloud.core.presentation.dto.mappers.NodeMapper;

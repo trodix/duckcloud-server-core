@@ -1,6 +1,6 @@
 package com.trodix.duckcloud.core.presentation.controllers;
 
-import com.trodix.duckcloud.core.business.services.TypeService;
+import com.trodix.duckcloud.core.domain.services.TypeService;
 import com.trodix.duckcloud.core.persistance.entities.Type;
 import com.trodix.duckcloud.core.presentation.dto.mappers.TypeMapper;
 import com.trodix.duckcloud.core.presentation.dto.requests.TypeRequest;
