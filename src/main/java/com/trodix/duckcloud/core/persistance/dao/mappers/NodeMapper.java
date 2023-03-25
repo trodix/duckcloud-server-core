@@ -16,7 +16,7 @@ public interface NodeMapper {
 
     List<TreeNode> findTreeNodesByParentId(Long parentId);
 
-    List<Node> findAllByNodeId(List<Long> ids);
+    List<Node> findAllByNodeId(@Param("ids") List<Long> ids);
 
     void insert(Node node);
 
