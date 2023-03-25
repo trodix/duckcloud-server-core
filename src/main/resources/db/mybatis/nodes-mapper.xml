@@ -52,23 +52,36 @@
         <include refid="select_node" />
     </select>
 
-    <insert id="insert" useGeneratedKeys="true">
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
         INSERT INTO nodes
         (
             parent_id, type_id
         )
         VALUES
         (
-            #{parentId}, #{typeId}
+            #{parentId}, #{type.id}
         )
+        RETURNING id
+    </insert>
+
+    <insert id="insertNodeTagAssociation">
+        INSERT INTO node_tag (node_id, tag_id) VALUES (#{nodeId}, #{tagId})
     </insert>
 
     <update id="update">
-        UPDATE nodes SET parent_id = #{parentId}, type_id = #{typeId} WHERE id = #{id}
+        UPDATE nodes SET parent_id = #{parentId}, type_id = #{type.id} WHERE id = #{id}
     </update>
 
     <delete id="delete">
         DELETE FROM nodes WHERE id = #{id}
+    </delete>
+
+    <delete id="deleteAllNodeTagAssociations">
+        DELETE FROM node_tag nt WHERE nt.node_id = #{id}
+    </delete>
+
+    <delete id="deleteNodeTagAssociation">
+        DELETE FROM node_tag nt WHERE nt.node_id = #{nodeId} AND nt.tag_id = #{tagId}
     </delete>
 
 </mapper>

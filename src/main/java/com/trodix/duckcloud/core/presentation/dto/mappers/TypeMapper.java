@@ -8,7 +8,12 @@ import org.mapstruct.Mapping;
 @Mapper
 public interface TypeMapper {
 
-    Type toEntity(TypeRequest request);
+    default Type toEntity(String request) {
+        Type type = new Type();
+        type.setName(request);
+
+        return type;
+    }
 
     default String toDto(Type type) {
         return type.getName();

@@ -14,8 +14,11 @@ public interface TypeMapper {
     @Select("SELECT * FROM types")
     List<Type> findAll();
 
+    @Select("SELECT * FROM types WHERE name = #{name}")
+    Type findOneByName(String typeName);
+
     @Insert("INSERT INTO types (name) VALUES (#{name})")
-    @Options(useGeneratedKeys = true, keyProperty = "id")
+    @Options(useGeneratedKeys = false, keyProperty = "id", keyColumn = "id")
     void insert(Type type);
 
     @Update("UPDATE types SET name = #{name} WHERE ID = #{id}")

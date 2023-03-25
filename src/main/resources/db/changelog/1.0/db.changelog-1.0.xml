@@ -62,7 +62,7 @@
                 <constraints nullable="false" foreignKeyName="fk_property_node" references="nodes(id)" />
             </column>
             <column name="property_name" type="VARCHAR(50)">
-                <constraints nullable="false" unique="true" uniqueConstraintName="property_name_ix1" />
+                <constraints nullable="false" unique="false" />
             </column>
             <column name="string_val" type="VARCHAR(255)">
                 <constraints nullable="true" unique="false" uniqueConstraintName="string_val_ix1" />
@@ -80,6 +80,8 @@
                 <constraints nullable="true" unique="false" uniqueConstraintName="date_val_ix1" />
             </column>
         </createTable>
+
+        <addUniqueConstraint tableName="properties" columnNames="node_id, property_name" constraintName="property_name_ix1" />
     </changeSet>
 
 </databaseChangeLog>

@@ -19,4 +19,7 @@ public interface PropertyMapper {
 
     void delete(Long id);
 
+    List<Property> findAllByNodeId(Long id);
+
+    void deleteByNodeId(Long id);
 }

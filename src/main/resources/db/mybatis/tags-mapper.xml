@@ -22,10 +22,16 @@
     </select>
 
     <select id="findAll" resultMap="result_Tag">
-        SELECT t.id as tag_id, t.name as tag_name FROM tags t
+        <include refid="select_Tag" />
     </select>
 
-    <insert id="insert" useGeneratedKeys="true">
+    <select id="findAllByNodeId" resultMap="result_Tag">
+        <include refid="select_Tag" />
+        INNER JOIN node_tag nt ON nt.tag_id = t.id
+        WHERE nt.node_id = #{id}
+    </select>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
         INSERT INTO tags (name) VALUES (#{name})
     </insert>
 

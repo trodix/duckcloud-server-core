@@ -33,14 +33,14 @@ public class TypeController {
     @PostMapping("")
     public void createType(@RequestBody TypeRequest request) {
 
-        final Type data = typeMapper.toEntity(request);
+        final Type data = typeMapper.toEntity(request.getName());
         typeService.createType(data);
     }
 
     @PutMapping("/{id}")
     public void updateType(@PathVariable Long id, @RequestBody TypeRequest request) {
 
-        final Type data = typeMapper.toEntity(request);
+        final Type data = typeMapper.toEntity(request.getName());
         data.setId(id);
 
         typeService.updateType(data);

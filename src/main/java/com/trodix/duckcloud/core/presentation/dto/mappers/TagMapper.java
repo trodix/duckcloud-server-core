@@ -10,7 +10,12 @@ import java.util.List;
 @Mapper
 public interface TagMapper {
 
-    Tag toEntity(TagRequest request);
+    default Tag toEntity(String request) {
+        Tag tag = new Tag();
+        tag.setName(request);
+
+        return tag;
+    }
 
     default String toDto(Tag tag) {
         return tag.getName();

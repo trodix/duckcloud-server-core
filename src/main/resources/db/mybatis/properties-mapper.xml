@@ -6,6 +6,7 @@
 
     <resultMap id="result_Property" type="Property">
         <result property="id" column="p_id" jdbcType="BIGINT" javaType="java.lang.Long" />
+        <result property="nodeId" column="p_node_id" jdbcType="BIGINT" javaType="java.lang.Long" />
         <result property="propertyName" column="p_property_name" jdbcType="VARCHAR" javaType="java.lang.String" />
         <result property="stringVal" column="p_string_val" jdbcType="VARCHAR" javaType="java.lang.String" />
         <result property="longVal" column="p_long_val" jdbcType="BIGINT" javaType="java.lang.Long" />
@@ -14,7 +15,8 @@
     </resultMap>
 
     <sql id="fields_Property">
-        p_node_id, p_property_name, p_string_val, p_long_val, p_double_val, p_date_val
+        p.id as p_id, p.node_id as p_node_id, p.property_name as p_property_name, p.string_val as p_string_val,
+        p.long_val as p_long_val, p.double_val as p_double_val, p.date_val as p_date_val
     </sql>
 
     <sql id="select_Property">
@@ -30,25 +32,34 @@
         <include refid="select_Property" />
     </select>
 
-    <insert id="insert" useGeneratedKeys="true">
+    <select id="findAllByNodeId" resultMap="result_Property">
+        <include refid="select_Property" />
+        WHERE p.node_id = #{id}
+    </select>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
         INSERT INTO properties
         (
             node_id, property_name, string_val, long_val, double_val, date_val
         )
         VALUES
         (
-            ${node_id}, #{property_name}, #{string_val}, #{long_val}, #{double_val}, #{date_val}
+            #{nodeId}, #{propertyName}, #{stringVal}, #{longVal}, #{doubleVal}, #{dateVal}
         )
     </insert>
 
     <update id="update">
-        UPDATE properties SET node_id= ${node_id}, property_name = #{property_name}, string_val = #{string_val},
-        long_val = #{long_val}, double_val = #{double_val}, date_val = #{date_val}
+        UPDATE properties SET node_id= ${nodeId}, property_name = #{propertyName}, string_val = #{stringVal},
+        long_val = #{longVal}, double_val = #{doubleVal}, date_val = #{dateVal}
         WHERE id = #{id}
     </update>
 
     <delete id="delete">
         DELETE FROM properties WHERE id = #{id}
+    </delete>
+
+    <delete id="deleteByNodeId">
+        DELETE FROM properties WHERE node_id = #{id}
     </delete>
 
 </mapper>

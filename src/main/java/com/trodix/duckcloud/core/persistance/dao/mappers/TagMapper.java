@@ -21,4 +21,5 @@ public interface TagMapper {
 
     void delete(Long id);
 
+    List<Tag> findAllByNodeId(Long id);
 }

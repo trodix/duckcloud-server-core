@@ -5,6 +5,7 @@ import com.trodix.duckcloud.core.persistance.entities.Node;
 import com.trodix.duckcloud.core.presentation.dto.mappers.NodeMapper;
 import com.trodix.duckcloud.core.presentation.dto.requests.NodeRequest;
 import com.trodix.duckcloud.core.presentation.dto.responses.NodeResponse;
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
@@ -36,14 +37,14 @@ public class NodeController {
     }
 
     @PostMapping("")
-    public void create(@RequestBody NodeRequest request) {
+    public void create(@RequestBody @Valid NodeRequest request) {
 
         final Node data = nodeMapper.toEntity(request);
         nodeService.create(data);
     }
 
     @PutMapping("/{id}")
-    public void update(@PathVariable Long id, @RequestBody NodeRequest request) {
+    public void update(@PathVariable Long id, @RequestBody @Valid NodeRequest request) {
 
         final Node data = nodeMapper.toEntity(request);
         data.setId(id);
