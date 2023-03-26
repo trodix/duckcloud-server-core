@@ -1,5 +1,6 @@
 package com.trodix.duckcloud.core.utils;
 
+import com.trodix.duckcloud.core.domain.models.ContentModel;
 import com.trodix.duckcloud.core.persistance.entities.Node;
 import com.trodix.duckcloud.core.persistance.entities.Property;
 import com.trodix.duckcloud.core.persistance.entities.Tag;

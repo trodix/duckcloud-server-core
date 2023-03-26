@@ -11,6 +11,7 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
+import javax.ws.rs.NotFoundException;
 import java.util.List;
 
 @RestController
@@ -25,7 +26,7 @@ public class NodeController {
 
     @GetMapping("/{id}")
     public NodeResponse getOne(@PathVariable Long id) {
-        Node result = nodeService.getOne(id);
+        Node result = nodeService.getOne(id).orElseThrow(() -> new NotFoundException("Node not found for id " + id));
         NodeResponse response = nodeMapper.toDto(result);
         return response;
     }

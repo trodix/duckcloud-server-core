@@ -6,11 +6,12 @@ import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
+import java.util.Optional;
 
 @Mapper
 public interface NodeMapper {
 
-    Node findOne(Long id);
+    Optional<Node> findOne(Long id);
 
     List<Node> findAll();
 

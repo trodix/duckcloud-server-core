@@ -9,7 +9,6 @@ import com.trodix.duckcloud.core.utils.NodeUtils;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -31,7 +30,7 @@ public class NodeManager {
     private final PropertyMapper propertyMapper;
 
 
-    public Node findOne(Long id) {
+    public Optional<Node> findOne(Long id) {
         return nodeMapper.findOne(id);
     }
 

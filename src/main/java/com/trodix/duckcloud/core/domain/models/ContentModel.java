@@ -1,4 +1,4 @@
-package com.trodix.duckcloud.core.utils;
+package com.trodix.duckcloud.core.domain.models;
 
 public class ContentModel {
     public static final String prefix = "cm";

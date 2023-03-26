@@ -67,8 +67,8 @@ public class StorageService {
         }
     }
 
-    public byte[] getFile(final String path, final String name) {
-        final GetObjectArgs args = GetObjectArgs.builder().bucket(ROOT_BUCKET).object(Path.of(path, name).toString()).build();
+    public byte[] getFile(final String bucket, final String path) {
+        final GetObjectArgs args = GetObjectArgs.builder().bucket(bucket).object(path).build();
         try (final InputStream obj = minioClient.getObject(args)) {
             return IOUtils.toByteArray(obj);
         } catch (final Exception e) {
@@ -86,7 +86,7 @@ public class StorageService {
         }
     }
 
-    protected String generateDirectoryPath() {
+    private String generateDirectoryPath() {
         Date date = Date.from(Instant.now());
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(date);

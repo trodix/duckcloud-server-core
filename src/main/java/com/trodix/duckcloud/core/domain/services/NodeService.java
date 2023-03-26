@@ -5,9 +5,10 @@ import com.trodix.duckcloud.core.persistance.dao.NodeManager;
 import com.trodix.duckcloud.core.persistance.entities.Node;
 import com.trodix.duckcloud.core.persistance.entities.Property;
 import com.trodix.duckcloud.core.persistance.entities.TreeNode;
-import com.trodix.duckcloud.core.presentation.dto.requests.NodeRequest;
-import com.trodix.duckcloud.core.utils.ContentModel;
+import com.trodix.duckcloud.core.domain.models.ContentModel;
+import com.trodix.duckcloud.core.domain.models.FileLocationParts;
 import com.trodix.duckcloud.core.utils.NodeUtils;
+import com.trodix.duckcloud.core.utils.StorageUtils;
 import io.minio.ObjectWriteResponse;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -27,7 +28,7 @@ public class NodeService {
 
     private final StorageService storageService;
 
-    public Node getOne(Long id) {
+    public Optional<Node> getOne(Long id) {
         return nodeManager.findOne(id);
     }
 
@@ -129,6 +130,22 @@ public class NodeService {
         metadata.setOriginalName(file.getOriginalFilename());
 
         return metadata;
+    }
+
+    public byte[] getFileContent(Node node) {
+        if (!NodeUtils.isContentType(node)) {
+            throw new IllegalArgumentException("Node must be of type " + ContentModel.TYPE_CONTENT);
+        }
+
+        Property contentLocation = NodeUtils.getProperty(node.getProperties(), ContentModel.PROP_CONTENT_LOCATION)
+                .orElseThrow(() -> new IllegalStateException(
+                        "Property " + ContentModel.PROP_CONTENT_LOCATION + " not found on node id " + node.getId()));
+
+        FileLocationParts fileLocationParts = StorageUtils.getFileLocationParts(contentLocation.getStringVal());
+
+        byte[] file = storageService.getFile(fileLocationParts.getBucket(), fileLocationParts.getPath());
+
+        return file;
     }
 
 }
