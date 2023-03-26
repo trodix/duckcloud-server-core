@@ -59,7 +59,7 @@ public class StorageService {
                     .stream(new ByteArrayInputStream(content), content.length, -1)
                     .build();
             final ObjectWriteResponse response = minioClient.putObject(obj);
-            log.debug("Created new object in storage: {}", response.object());
+            log.debug("Created new object in storage: bucket={} path={}", response.bucket(), response.object());
             return response;
         } catch (final Exception e) {
             throw new RuntimeException(e.getMessage());
@@ -76,10 +76,11 @@ public class StorageService {
         return null;
     }
 
-    public void deleteFile(final String path, final String name) {
-        final RemoveObjectArgs args = RemoveObjectArgs.builder().bucket(ROOT_BUCKET).object(Path.of(path, name).toString()).build();
+    public void deleteFile(final String bucket, final String path) {
+        final RemoveObjectArgs args = RemoveObjectArgs.builder().bucket(bucket).object(path).build();
         try {
             minioClient.removeObject(args);
+            log.debug("File removed at bucket={} and path={}", bucket, path);
         } catch (final Exception e) {
             e.printStackTrace();
         }

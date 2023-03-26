@@ -49,9 +49,7 @@ public class NodeService {
                     .filter(treeNode -> treeNode.getNodeId() == node.getId())
                     .findAny()
                     .ifPresent(nodeTree -> {
-                        nodeTree.setName(
-                                node.getProperties().stream()
-                                        .filter(p -> p.getPropertyName().equals(ContentModel.PROP_NAME)).findAny().get().getStringVal());
+                        nodeTree.setName(NodeUtils.getProperty(node.getProperties(), ContentModel.PROP_NAME).map(p -> p.getStringVal()).orElse(""));
 
                         nodeTree.setType(node.getType().getName());
                     });
@@ -112,6 +110,19 @@ public class NodeService {
     }
 
     public void delete(Long id) {
+
+        Node node = getOne(id).orElseThrow(() -> new IllegalArgumentException("Node with id " + id + " not found"));
+
+        if (ModelUtils.isContentType(node)) {
+            Property contentLocation = NodeUtils.getProperty(node.getProperties(), ContentModel.PROP_CONTENT_LOCATION)
+                    .orElseThrow(() -> new IllegalStateException(
+                            "Property " + ContentModel.PROP_CONTENT_LOCATION + " not found on node id " + node.getId()));
+
+            FileLocationParts fileLocationParts = StorageUtils.getFileLocationParts(contentLocation.getStringVal());
+
+            storageService.deleteFile(fileLocationParts.getBucket(), fileLocationParts.getPath());
+        }
+
         nodeManager.delete(id);
     }
 
