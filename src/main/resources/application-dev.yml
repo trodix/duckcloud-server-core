@@ -14,3 +14,7 @@ spring:
 app:
   auth:
     allowed-origins: http://localhost:4200
+  storage:
+    endpoint: http://127.0.0.1:9000
+    accessKey: SykAM0TXTf3OVp5j
+    secretKey: JI4xH7DoE3q4GWlpomjiq3l6lkTn2xVS

@@ -7,6 +7,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.Singular;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Data
@@ -19,8 +20,8 @@ public class NodeRequest {
     @NotBlank
     private String type;
 
-    private List<String> tags;
+    private List<String> tags = new ArrayList<>();
 
-    private List<PropertyRequest> properties;
+    private List<PropertyRequest> properties = new ArrayList<>();
 
 }

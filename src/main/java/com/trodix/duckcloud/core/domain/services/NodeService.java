@@ -1,14 +1,22 @@
 package com.trodix.duckcloud.core.domain.services;
 
+import com.trodix.duckcloud.core.domain.models.FileStoreMetadata;
 import com.trodix.duckcloud.core.persistance.dao.NodeManager;
 import com.trodix.duckcloud.core.persistance.entities.Node;
+import com.trodix.duckcloud.core.persistance.entities.Property;
 import com.trodix.duckcloud.core.persistance.entities.TreeNode;
+import com.trodix.duckcloud.core.presentation.dto.requests.NodeRequest;
+import com.trodix.duckcloud.core.utils.ContentModel;
+import com.trodix.duckcloud.core.utils.NodeUtils;
+import io.minio.ObjectWriteResponse;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @AllArgsConstructor
@@ -16,6 +24,8 @@ import java.util.List;
 public class NodeService {
 
     private final NodeManager nodeManager;
+
+    private final StorageService storageService;
 
     public Node getOne(Long id) {
         return nodeManager.findOne(id);
@@ -39,7 +49,7 @@ public class NodeService {
                     .ifPresent(nodeTree -> {
                         nodeTree.setName(
                                 node.getProperties().stream()
-                                        .filter(p -> p.getPropertyName().equals("cm:name")).findAny().get().getStringVal());
+                                        .filter(p -> p.getPropertyName().equals(ContentModel.PROP_NAME)).findAny().get().getStringVal());
 
                         nodeTree.setType(node.getType().getName());
                     });
@@ -67,12 +77,58 @@ public class NodeService {
         nodeManager.create(node);
     }
 
+    public void createNodeWithContent(Node node, FileStoreMetadata fileStoreMetadata, byte[] file) {
+
+        if (!NodeUtils.isContentType(node)) {
+            throw new IllegalArgumentException("Node should be of type " + ContentModel.TYPE_CONTENT);
+        }
+
+        ObjectWriteResponse storedFileResponse = storageService.uploadFile(fileStoreMetadata, file);
+        String objectBucket = storedFileResponse.bucket();
+        String objectPath = storedFileResponse.object();
+        String fullPath = objectBucket + ":" + objectPath;
+        log.debug("File uploaded at path: {}", fullPath);
+
+        Property contentLocation = new Property();
+        contentLocation.setPropertyName(ContentModel.PROP_CONTENT_LOCATION);
+        contentLocation.setStringVal(fullPath);
+        NodeUtils.addProperty(node, contentLocation);
+
+        if (NodeUtils.getProperty(node.getProperties(), ContentModel.PROP_NAME).isEmpty()) {
+            Property fileName = new Property();
+            fileName.setPropertyName(ContentModel.PROP_NAME);
+            fileName.setStringVal(fileStoreMetadata.getOriginalName());
+
+            NodeUtils.addProperty(node, fileName);
+        }
+
+        create(node);
+    }
+
     public void update(Node node) {
         nodeManager.update(node);
     }
 
     public void delete(Long id) {
         nodeManager.delete(id);
+    }
+
+    public FileStoreMetadata buildFileStoreMetadata(Node node, MultipartFile file) {
+        FileStoreMetadata metadata = new FileStoreMetadata();
+        metadata.setContentType(file.getContentType());
+
+        Optional<Property> bucket = NodeUtils.getProperty(node.getProperties(), ContentModel.PROP_BUCKET);
+        if (bucket.isPresent()) {
+            metadata.setBucket(bucket.get().getStringVal());
+        } else {
+            metadata.setBucket(null);
+        }
+
+        metadata.setDirectoryPath(null);
+        metadata.setUuid(null);
+        metadata.setOriginalName(file.getOriginalFilename());
+
+        return metadata;
     }
 
 }

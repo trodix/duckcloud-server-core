@@ -5,6 +5,7 @@ import com.trodix.duckcloud.core.persistance.dao.mappers.PropertyMapper;
 import com.trodix.duckcloud.core.persistance.dao.mappers.TagMapper;
 import com.trodix.duckcloud.core.persistance.dao.mappers.TypeMapper;
 import com.trodix.duckcloud.core.persistance.entities.*;
+import com.trodix.duckcloud.core.utils.NodeUtils;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
@@ -29,35 +30,6 @@ public class NodeManager {
 
     private final PropertyMapper propertyMapper;
 
-    public static List<String> tagsToNameList(List<Tag> tags) {
-        return tags.stream().map(p -> p.getName()).toList();
-    }
-
-    public static List<String> propertiesToNameList(List<Property> properties) {
-        return properties.stream().map(p -> p.getPropertyName()).toList();
-    }
-
-    public static Optional<Property> getProperty(List<Property> properties, String propName) {
-        return properties.stream().filter(p -> p.getPropertyName().equals(propName)).findFirst();
-    }
-
-    public static boolean isPropertiesValueEquals(Property p1, Property p2) {
-        if (!(new EqualsBuilder().append(p1.getPropertyName(), p2.getPropertyName()).isEquals())) {
-            throw new IllegalArgumentException("Comparing different properties: " + p1.getPropertyName() + " with " + p2.getPropertyName());
-        }
-
-        if (p1.getStringVal() != null && p2.getStringVal() != null) {
-            return p1.getStringVal().equals(p2.getStringVal());
-        } else if (p1.getLongVal() != null && p2.getLongVal() != null) {
-            return p1.getLongVal() == p2.getLongVal();
-        } else if (p1.getDoubleVal() != null && p2.getDoubleVal() != null) {
-            return p1.getDoubleVal() == p2.getDoubleVal();
-        } else if (p1.getDateVal() != null && p2.getDateVal() != null) {
-            return p1.getDateVal() != p2.getDateVal();
-        }
-
-        return false;
-    }
 
     public Node findOne(Long id) {
         return nodeMapper.findOne(id);
@@ -126,9 +98,9 @@ public class NodeManager {
         List<Tag> savedTagsForNode = findSavedTagsForNode(node);
         List<Tag> existingTagsInDb = tagMapper.findAll();
 
-        Collection<String> toInsertTagList = CollectionUtils.subtract(tagsToNameList(node.getTags()), tagsToNameList(existingTagsInDb));
-        Collection<String> toDeleteAssocList = CollectionUtils.subtract(tagsToNameList(savedTagsForNode), tagsToNameList(node.getTags()));
-        Collection<String> toInsertAssocList = CollectionUtils.subtract(tagsToNameList(node.getTags()), tagsToNameList(savedTagsForNode));
+        Collection<String> toInsertTagList = CollectionUtils.subtract(NodeUtils.tagsToNameList(node.getTags()), NodeUtils.tagsToNameList(existingTagsInDb));
+        Collection<String> toDeleteAssocList = CollectionUtils.subtract(NodeUtils.tagsToNameList(savedTagsForNode), NodeUtils.tagsToNameList(node.getTags()));
+        Collection<String> toInsertAssocList = CollectionUtils.subtract(NodeUtils.tagsToNameList(node.getTags()), NodeUtils.tagsToNameList(savedTagsForNode));
 
         for (String toDeleteAssoc : toDeleteAssocList) {
             Tag toDeleteTagAssoc = savedTagsForNode.stream().filter(t -> t.getName().equals(toDeleteAssoc)).findAny().get();
@@ -154,8 +126,8 @@ public class NodeManager {
     protected void updateAssociatedProperties(Node node) {
         List<Property> existingPropertiesInDb = findSavedPropertiesForNode(node);
 
-        Collection<String> toDeleteList = CollectionUtils.subtract(propertiesToNameList(existingPropertiesInDb), propertiesToNameList(node.getProperties()));
-        Collection<String> toInsertList = CollectionUtils.subtract(propertiesToNameList(node.getProperties()), propertiesToNameList(existingPropertiesInDb));
+        Collection<String> toDeleteList = CollectionUtils.subtract(NodeUtils.propertiesToNameList(existingPropertiesInDb), NodeUtils.propertiesToNameList(node.getProperties()));
+        Collection<String> toInsertList = CollectionUtils.subtract(NodeUtils.propertiesToNameList(node.getProperties()), NodeUtils.propertiesToNameList(existingPropertiesInDb));
 
         for (String toDelete : toDeleteList) {
             Property toDeleteProperty = existingPropertiesInDb.stream().filter(p -> p.getPropertyName().equals(toDelete)).findAny().get();
@@ -171,10 +143,10 @@ public class NodeManager {
         }
 
         for (Property savedPropertyForNode : existingPropertiesInDb) {
-            Property propertyOnNode = getProperty(node.getProperties(), savedPropertyForNode.getPropertyName()).get();
-            if (propertiesToNameList(node.getProperties()).contains(savedPropertyForNode.getPropertyName())) {
+            Property propertyOnNode = NodeUtils.getProperty(node.getProperties(), savedPropertyForNode.getPropertyName()).get();
+            if (NodeUtils.propertiesToNameList(node.getProperties()).contains(savedPropertyForNode.getPropertyName())) {
                 // property already exists
-                if (!isPropertiesValueEquals(propertyOnNode, savedPropertyForNode)) {
+                if (!NodeUtils.isPropertiesValueEquals(propertyOnNode, savedPropertyForNode)) {
                     // update property
                     propertyOnNode.setId(savedPropertyForNode.getId());
                     propertyOnNode.setNodeId(node.getId());
