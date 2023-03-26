@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.trodix.duckcloud.persistance.dao.mappers.TagMapper">
+
+    <resultMap id="result_Tag" type="Tag">
+        <result property="id" column="tag_id" jdbcType="BIGINT" javaType="java.lang.Long" />
+        <result property="name" column="tag_name" jdbcType="VARCHAR" javaType="java.lang.String" />
+    </resultMap>
+
+    <sql id="fields_Tag">
+        t.id as tag_id, t.name as tag_name
+    </sql>
+
+    <sql id="select_Tag">
+        SELECT <include refid="fields_Tag" /> FROM tags t
+    </sql>
+
+    <select id="findOne" resultMap="result_Tag">
+        <include refid="select_Tag" /> WHERE t.id = #{id}
+    </select>
+
+    <select id="findAll" resultMap="result_Tag">
+        <include refid="select_Tag" />
+    </select>
+
+    <select id="findAllByNodeId" resultMap="result_Tag">
+        <include refid="select_Tag" />
+        INNER JOIN node_tag nt ON nt.tag_id = t.id
+        WHERE nt.node_id = #{id}
+    </select>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
+        INSERT INTO tags (name) VALUES (#{name})
+    </insert>
+
+    <update id="update">
+        UPDATE tags SET name = #{name}
+    </update>
+
+    <delete id="delete">
+        DELETE FROM tags t WHERE t.id = #{id}
+    </delete>
+
+</mapper>

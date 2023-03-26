@@ -1,7 +1,7 @@
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="DuckcloudServerApplication" type="Application" factoryName="Application" nameIsGenerated="true">
     <option name="MAIN_CLASS_NAME" value="com.trodix.duckcloud.core.DuckcloudServerApplication" />
-    <module name="core" />
+    <module name="duckcloud-server-core" />
     <extension name="coverage">
       <pattern>
         <option name="PATTERN" value="com.trodix.duckcloud.core.*" />
