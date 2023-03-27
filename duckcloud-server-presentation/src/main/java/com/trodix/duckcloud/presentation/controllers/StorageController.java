@@ -16,11 +16,13 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Scope;
 import org.springframework.core.io.ByteArrayResource;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.server.ResponseStatusException;
 
 import javax.ws.rs.NotFoundException;
 import java.io.IOException;
@@ -57,11 +59,21 @@ public class StorageController {
 
     }
 
+    @Operation(summary = "Update a file attached to a node")
+    @PutMapping(path = "/nodes/{nodeId}/content", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
+    public void create(@PathVariable final Long nodeId, @RequestPart(value = "file") final MultipartFile file) throws IOException {
+
+        final Node node = nodeService.getOne(nodeId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Node not found for id " + nodeId));
+        FileStoreMetadata fileStoreMetadata = nodeService.buildFileStoreMetadata(node, file);
+        nodeService.updateNodeContent(node, fileStoreMetadata, file.getBytes());
+
+    }
+
     @Operation(summary = "Get the content of the latest version of the file attached to the node")
-    @GetMapping("/node/{nodeId}/content")
+    @GetMapping("/nodes/{nodeId}/content")
     public ResponseEntity<ByteArrayResource> getNodeContentById(@PathVariable final Long nodeId) {
 
-        Node node = nodeService.getOne(nodeId).orElseThrow(() -> new NotFoundException("Node not found for id " + nodeId));
+        Node node = nodeService.getOne(nodeId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Node not found for id " + nodeId));
 
         final byte[] file = nodeService.getFileContent(node);
         final ByteArrayResource resource = new ByteArrayResource(file);

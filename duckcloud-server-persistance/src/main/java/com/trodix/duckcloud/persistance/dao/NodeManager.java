@@ -12,6 +12,7 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
@@ -141,18 +142,17 @@ public class NodeManager {
             existingPropertiesInDb.add(toInsertProperty);
         }
 
-        for (Property savedPropertyForNode : existingPropertiesInDb) {
-            Property propertyOnNode = NodeUtils.getProperty(node.getProperties(), savedPropertyForNode.getPropertyName()).get();
-            if (NodeUtils.propertiesToNameList(node.getProperties()).contains(savedPropertyForNode.getPropertyName())) {
-                // property already exists
-                if (!NodeUtils.isPropertiesValueEquals(propertyOnNode, savedPropertyForNode)) {
-                    // update property
-                    propertyOnNode.setId(savedPropertyForNode.getId());
-                    propertyOnNode.setNodeId(node.getId());
-                    propertyMapper.update(propertyOnNode);
+        // update properties
+        for (Property property : node.getProperties()) {
+            for (Property dbProperty : existingPropertiesInDb) {
+                if (property.getPropertyName().equals(dbProperty.getPropertyName()) && !NodeUtils.isPropertiesValueEquals(property, dbProperty)) {
+                    property.setId(dbProperty.getId());
+                    property.setNodeId(dbProperty.getNodeId());
+                    propertyMapper.update(property);
                 }
             }
         }
+
     }
 
 }

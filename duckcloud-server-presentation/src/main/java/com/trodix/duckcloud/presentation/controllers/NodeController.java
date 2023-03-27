@@ -9,7 +9,9 @@ import com.trodix.duckcloud.presentation.dto.responses.NodeResponse;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import javax.ws.rs.NotFoundException;
 import java.util.List;
@@ -26,7 +28,7 @@ public class NodeController {
 
     @GetMapping("/{id}")
     public NodeResponse getOne(@PathVariable Long id) {
-        Node result = nodeService.getOne(id).orElseThrow(() -> new NotFoundException("Node not found for id " + id));
+        Node result = nodeService.getOne(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Node not found for id " + id));
         NodeResponse response = nodeMapper.toDto(result);
         return response;
     }

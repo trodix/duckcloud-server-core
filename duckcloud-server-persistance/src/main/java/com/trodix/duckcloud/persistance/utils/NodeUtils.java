@@ -5,10 +5,7 @@ import com.trodix.duckcloud.persistance.entities.Property;
 import com.trodix.duckcloud.persistance.entities.Tag;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 public class NodeUtils {
 
@@ -30,11 +27,19 @@ public class NodeUtils {
         return properties.stream().filter(p -> p.getPropertyName().equals(propName)).findFirst();
     }
 
+    public static boolean hasProperty(List<Property> properties, String propName) {
+        return properties.stream().filter(p -> p.getPropertyName().equals(propName)).findAny().isPresent();
+    }
+
     public static void addProperty(Node node, Property property) {
         if (node.getProperties() == null) {
             node.setProperties(new ArrayList<>());
         }
         node.getProperties().add(property);
+    }
+
+    public static void removeProperty(List<Property> properties, String propName) {
+        properties.removeIf(p -> p.getPropertyName().equals(propName));
     }
 
     public static boolean isPropertiesValueEquals(Property p1, Property p2) {

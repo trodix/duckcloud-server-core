@@ -83,6 +83,12 @@ public class NodeService {
             throw new IllegalArgumentException("Node should be of type " + ContentModel.TYPE_CONTENT);
         }
 
+        createContentForNode(node, fileStoreMetadata, file);
+
+        create(node);
+    }
+
+    private void createContentForNode(Node node, FileStoreMetadata fileStoreMetadata, byte[] file) {
         ObjectWriteResponse storedFileResponse = storageService.uploadFile(fileStoreMetadata, file);
         String objectBucket = storedFileResponse.bucket();
         String objectPath = storedFileResponse.object();
@@ -92,17 +98,39 @@ public class NodeService {
         Property contentLocation = new Property();
         contentLocation.setPropertyName(ContentModel.PROP_CONTENT_LOCATION);
         contentLocation.setStringVal(fullPath);
+        if (NodeUtils.hasProperty(node.getProperties(), ContentModel.PROP_CONTENT_LOCATION)) {
+            NodeUtils.removeProperty(node.getProperties(), ContentModel.PROP_CONTENT_LOCATION);
+        }
         NodeUtils.addProperty(node, contentLocation);
 
-        if (NodeUtils.getProperty(node.getProperties(), ContentModel.PROP_NAME).isEmpty()) {
-            Property fileName = new Property();
-            fileName.setPropertyName(ContentModel.PROP_NAME);
-            fileName.setStringVal(fileStoreMetadata.getOriginalName());
-
-            NodeUtils.addProperty(node, fileName);
+        if (NodeUtils.hasProperty(node.getProperties(), ContentModel.PROP_NAME)) {
+            NodeUtils.removeProperty(node.getProperties(), ContentModel.PROP_NAME);
         }
 
-        create(node);
+        Property fileName = new Property();
+        fileName.setPropertyName(ContentModel.PROP_NAME);
+        fileName.setStringVal(fileStoreMetadata.getOriginalName());
+
+        NodeUtils.addProperty(node, fileName);
+    }
+
+    public void updateNodeContent(Node node, FileStoreMetadata fileStoreMetadata, byte[] file) {
+
+        if (!ModelUtils.isContentType(node)) {
+            throw new IllegalArgumentException("Node should be of type " + ContentModel.TYPE_CONTENT);
+        }
+
+        Optional<Property> optionalContentLocation = NodeUtils.getProperty(node.getProperties(), ContentModel.PROP_CONTENT_LOCATION);
+
+        if (optionalContentLocation.isPresent()) {
+            String contentLocation = optionalContentLocation.get().getStringVal();
+            FileLocationParts contentLocationParts = StorageUtils.getFileLocationParts(contentLocation);
+            storageService.deleteFile(contentLocationParts.getBucket(), contentLocationParts.getPath());
+        }
+
+        createContentForNode(node, fileStoreMetadata, file);
+        update(node);
+
     }
 
     public void update(Node node) {
