@@ -1,8 +1,6 @@
 package com.trodix.duckcloud.domain.services;
 
-import com.trodix.duckcloud.domain.models.ContentModel;
-import com.trodix.duckcloud.domain.models.FileLocationParts;
-import com.trodix.duckcloud.domain.models.FileStoreMetadata;
+import com.trodix.duckcloud.domain.models.*;
 import com.trodix.duckcloud.domain.utils.ModelUtils;
 import com.trodix.duckcloud.domain.utils.StorageUtils;
 import com.trodix.duckcloud.persistance.dao.NodeManager;
@@ -10,12 +8,14 @@ import com.trodix.duckcloud.persistance.entities.Node;
 import com.trodix.duckcloud.persistance.entities.Property;
 import com.trodix.duckcloud.persistance.entities.TreeNode;
 import com.trodix.duckcloud.persistance.utils.NodeUtils;
+import com.trodix.duckcloud.security.services.AuthenticationService;
 import io.minio.ObjectWriteResponse;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -29,6 +29,8 @@ public class NodeService {
 
     private final StorageService storageService;
 
+    private final AuthenticationService authenticationService;
+
     public Optional<Node> getOne(Long id) {
         return nodeManager.findOne(id);
     }
@@ -37,8 +39,30 @@ public class NodeService {
         return nodeManager.findAll();
     }
 
-    public List<TreeNode> buildTreeFromParent(Long parentId) {
-        List<TreeNode> treeNodeList = nodeManager.buildTreeFromParent(parentId);
+    public List<Node> getChildren(Long id) {
+        return nodeManager.findAllByParentId(id);
+    }
+
+    public List<NodeWithPath> getChildrenWithPath(Long id) {
+        List<String> path = nodeManager.buildTreeFromParent(id, 0).stream().map(tn -> tn.getNodePath()).toList().get(0);
+        List<Node> parentNodes = nodeManager.findAllByNodeId(path.stream().map(p -> Long.valueOf(p)).toList());
+        List<NodePath> pathObj = parentNodes.stream().map(n -> new NodePath(n.getId(), NodeUtils.getProperty(n.getProperties(), ContentModel.PROP_NAME).get().getStringVal())).toList();
+        return getChildren(id).stream().map(n -> {
+            NodeWithPath nodeWithPath = new NodeWithPath();
+            nodeWithPath.setId(n.getId());
+            nodeWithPath.setParentId(n.getParentId());
+            nodeWithPath.setType(n.getType());
+            nodeWithPath.setTags(n.getTags());
+            nodeWithPath.setProperties(n.getProperties());
+            nodeWithPath.setPath(pathObj);
+
+            return nodeWithPath;
+        }).toList();
+    }
+
+    public List<TreeNode> buildTreeFromParent(Long parentId, int nodeLevel) {
+
+        List<TreeNode> treeNodeList = nodeManager.buildTreeFromParent(parentId, nodeLevel);
 
         // associate node properties to tree items
         List<Long> nodeIdsInTree = treeNodeList.stream().map(n -> n.getNodeId()).toList();
@@ -52,6 +76,8 @@ public class NodeService {
                         nodeTree.setName(NodeUtils.getProperty(node.getProperties(), ContentModel.PROP_NAME).map(p -> p.getStringVal()).orElse(""));
 
                         nodeTree.setType(node.getType().getName());
+                        nodeTree.setTags(node.getTags());
+                        nodeTree.setProperties(node.getProperties());
                     });
         });
 
@@ -74,6 +100,7 @@ public class NodeService {
     }
 
     public void create(Node node) {
+        setCreatedAuthorProperties(node);
         nodeManager.create(node);
     }
 
@@ -98,19 +125,16 @@ public class NodeService {
         Property contentLocation = new Property();
         contentLocation.setPropertyName(ContentModel.PROP_CONTENT_LOCATION);
         contentLocation.setStringVal(fullPath);
-        if (NodeUtils.hasProperty(node.getProperties(), ContentModel.PROP_CONTENT_LOCATION)) {
-            NodeUtils.removeProperty(node.getProperties(), ContentModel.PROP_CONTENT_LOCATION);
-        }
         NodeUtils.addProperty(node, contentLocation);
 
-        if (NodeUtils.hasProperty(node.getProperties(), ContentModel.PROP_NAME)) {
-            NodeUtils.removeProperty(node.getProperties(), ContentModel.PROP_NAME);
-        }
+        Property contentSize = new Property();
+        contentSize.setPropertyName(ContentModel.PROP_CONTENT_SIZE);
+        contentSize.setLongVal(Long.valueOf(file.length));
+        NodeUtils.addProperty(node, contentSize);
 
         Property fileName = new Property();
         fileName.setPropertyName(ContentModel.PROP_NAME);
         fileName.setStringVal(fileStoreMetadata.getOriginalName());
-
         NodeUtils.addProperty(node, fileName);
     }
 
@@ -130,11 +154,63 @@ public class NodeService {
 
         createContentForNode(node, fileStoreMetadata, file);
         update(node);
-
     }
 
     public void update(Node node) {
+        setModifiedAuthorProperties(node);
+        // merge updated properties with existing properties
+        Node existingNode = getOne(node.getId()).orElseThrow(() -> new IllegalArgumentException("Trying to update a node not found in database"));
+        NodeUtils.addProperties(node, existingNode.getProperties());
         nodeManager.update(node);
+    }
+
+    public void setCreatedAuthorProperties(Node node) {
+        final Property createdAtProp = new Property();
+        createdAtProp.setPropertyName(ContentModel.PROP_CREATED_AT);
+        createdAtProp.setDateVal(OffsetDateTime.now());
+
+        final Property createdByProp = new Property();
+        createdByProp.setPropertyName(ContentModel.PROP_CREATED_BY);
+        createdByProp.setStringVal(authenticationService.getUserId());
+
+        final Property createdByDisplayNameProp = new Property();
+        createdByDisplayNameProp.setPropertyName(ContentModel.PROP_CREATED_BY_DISPLAY_NAME);
+        createdByDisplayNameProp.setStringVal(authenticationService.getName());
+
+        NodeUtils.addProperty(node, createdAtProp);
+        NodeUtils.addProperty(node, createdByProp);
+        NodeUtils.addProperty(node, createdByDisplayNameProp);
+    }
+
+    public void setModifiedAuthorProperties(Node node) {
+
+        String userId;
+        String userName;
+
+        try {
+            userId = authenticationService.getUserId();
+            userName = authenticationService.getName();
+        } catch (RuntimeException e) {
+            // FIXME is not authenticated (onlyoffice public endpoint)
+            userId = AuthenticationService.DEFAULT_USER;
+            userName = AuthenticationService.DEFAULT_USER;
+        }
+
+        final Property modifiedAtProp = new Property();
+        modifiedAtProp.setPropertyName(ContentModel.PROP_MODIFIED_AT);
+        modifiedAtProp.setDateVal(OffsetDateTime.now());
+
+        final Property modifiedByProp = new Property();
+        modifiedByProp.setPropertyName(ContentModel.PROP_MODIFIED_BY);
+        modifiedByProp.setStringVal(userId);
+
+        final Property modifiedByDisplayNameProp = new Property();
+        modifiedByDisplayNameProp.setPropertyName(ContentModel.PROP_MODIFIED_BY_DISPLAY_NAME);
+        modifiedByDisplayNameProp.setStringVal(userName);
+
+        NodeUtils.addProperty(node, modifiedAtProp);
+        NodeUtils.addProperty(node, modifiedByProp);
+        NodeUtils.addProperty(node, modifiedByDisplayNameProp);
     }
 
     public void delete(Long id) {
@@ -142,13 +218,13 @@ public class NodeService {
         Node node = getOne(id).orElseThrow(() -> new IllegalArgumentException("Node with id " + id + " not found"));
 
         if (ModelUtils.isContentType(node)) {
-            Property contentLocation = NodeUtils.getProperty(node.getProperties(), ContentModel.PROP_CONTENT_LOCATION)
-                    .orElseThrow(() -> new IllegalStateException(
-                            "Property " + ContentModel.PROP_CONTENT_LOCATION + " not found on node id " + node.getId()));
+            Optional<Property> contentLocation = NodeUtils.getProperty(node.getProperties(), ContentModel.PROP_CONTENT_LOCATION);
 
-            FileLocationParts fileLocationParts = StorageUtils.getFileLocationParts(contentLocation.getStringVal());
+            if (contentLocation.isPresent()) {
+                FileLocationParts fileLocationParts = StorageUtils.getFileLocationParts(contentLocation.get().getStringVal());
+                storageService.deleteFile(fileLocationParts.getBucket(), fileLocationParts.getPath());
+            }
 
-            storageService.deleteFile(fileLocationParts.getBucket(), fileLocationParts.getPath());
         }
 
         nodeManager.delete(id);

@@ -20,8 +20,18 @@
 
     <dependencies>
         <dependency>
-            <groupId>com.trodix.duckcloud.persentation</groupId>
+            <groupId>com.trodix.duckcloud.security</groupId>
+            <artifactId>duckcloud-server-security</artifactId>
+            <version>${project.parent.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.trodix.duckcloud.presentation</groupId>
             <artifactId>duckcloud-server-presentation</artifactId>
+            <version>${project.parent.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.trodix.duckcloud.connectors</groupId>
+            <artifactId>duckcloud-server-connectors</artifactId>
             <version>${project.parent.version}</version>
         </dependency>
     </dependencies>

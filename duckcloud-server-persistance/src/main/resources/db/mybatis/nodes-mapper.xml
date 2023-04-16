@@ -90,6 +90,11 @@
         </foreach>
     </select>
 
+    <select id="findAllByParentId" resultMap="result_Node">
+        <include refid="select_node" />
+        WHERE n.parent_id = #{parentId}
+    </select>
+
     <insert id="insert" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
         INSERT INTO nodes
         (

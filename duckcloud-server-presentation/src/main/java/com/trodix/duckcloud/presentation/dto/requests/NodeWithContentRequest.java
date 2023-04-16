@@ -3,11 +3,14 @@ package com.trodix.duckcloud.presentation.dto.requests;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 
+import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Data
-public class NodeRequest {
+public class NodeWithContentRequest {
 
     private Long id;
 
@@ -18,6 +21,6 @@ public class NodeRequest {
 
     private List<String> tags = new ArrayList<>();
 
-    private List<PropertyRequest> properties;
+    private Map<String, Serializable> properties = new HashMap<>();
 
 }

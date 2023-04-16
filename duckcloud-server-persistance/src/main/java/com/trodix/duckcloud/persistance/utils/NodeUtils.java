@@ -3,15 +3,19 @@ package com.trodix.duckcloud.persistance.utils;
 import com.trodix.duckcloud.persistance.entities.Node;
 import com.trodix.duckcloud.persistance.entities.Property;
 import com.trodix.duckcloud.persistance.entities.Tag;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 
+@Slf4j
 public class NodeUtils {
 
     public static List<String> tagsToNameList(List<Tag> tags) {
         if (tags == null) {
-            return Collections.emptyList();
+            return new ArrayList<>();
         }
         return tags.stream().map(p -> p.getName()).toList();
     }
@@ -31,14 +35,34 @@ public class NodeUtils {
         return properties.stream().filter(p -> p.getPropertyName().equals(propName)).findAny().isPresent();
     }
 
+    public static boolean hasProperty(Node node, String propName) {
+        return node.getProperties().stream().filter(p -> p.getPropertyName().equals(propName)).findAny().isPresent();
+    }
+
+    public static void addProperties(Node node, List<Property> properties) {
+        for (Property p : properties) {
+            addProperty(node, p);
+        }
+    }
+
     public static void addProperty(Node node, Property property) {
+        log.trace("addProperty: {}", property);
         if (node.getProperties() == null) {
             node.setProperties(new ArrayList<>());
         }
-        node.getProperties().add(property);
+
+        if (hasProperty(node, property.getPropertyName())) {
+            removeProperty(node.getProperties(), property.getPropertyName());
+            Property currentProperty = getProperty(node.getProperties(), property.getPropertyName()).orElse(property);
+            property.setId(currentProperty.getId());
+            addProperty(node, property);
+        } else {
+            node.getProperties().add(property);
+        }
     }
 
     public static void removeProperty(List<Property> properties, String propName) {
+        log.trace("removeProperty: {}", propName);
         properties.removeIf(p -> p.getPropertyName().equals(propName));
     }
 

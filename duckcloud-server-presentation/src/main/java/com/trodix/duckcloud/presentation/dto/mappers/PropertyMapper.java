@@ -5,11 +5,31 @@ import com.trodix.duckcloud.presentation.dto.requests.PropertyRequest;
 import com.trodix.duckcloud.presentation.dto.responses.PropertyResponse;
 import org.mapstruct.Mapper;
 
+import java.io.Serializable;
 import java.time.OffsetDateTime;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Mapper
 public interface PropertyMapper {
+
+    default List<Property> toEntity(Map<String, Serializable> map) {
+        List<PropertyRequest> propertiRequestList = new ArrayList<>();
+
+        for (Map.Entry<String, Serializable> entry : map.entrySet()) {
+            PropertyRequest propertyRequest = new PropertyRequest();
+            propertyRequest.setKey(entry.getKey());
+            propertyRequest.setValue(entry.getValue());
+
+            propertiRequestList.add(propertyRequest);
+        }
+
+        List<Property> result = propertiRequestList.stream().map(p -> toEntity(p)).collect(Collectors.toList());
+
+        return result;
+    }
 
     default Property toEntity(PropertyRequest request) {
         Property property = new Property();

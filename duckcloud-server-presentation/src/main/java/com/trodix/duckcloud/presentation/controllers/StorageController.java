@@ -7,7 +7,7 @@ import com.trodix.duckcloud.domain.services.StorageService;
 import com.trodix.duckcloud.persistance.entities.Node;
 import com.trodix.duckcloud.persistance.utils.NodeUtils;
 import com.trodix.duckcloud.presentation.dto.mappers.NodeMapper;
-import com.trodix.duckcloud.presentation.dto.requests.NodeRequest;
+import com.trodix.duckcloud.presentation.dto.requests.NodeWithContentRequest;
 import io.minio.messages.Bucket;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.annotation.security.RolesAllowed;
@@ -24,7 +24,6 @@ import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
-import javax.ws.rs.NotFoundException;
 import java.io.IOException;
 import java.util.List;
 
@@ -50,8 +49,8 @@ public class StorageController {
     }
 
     @Operation(summary = "Create a new node and attach a file")
-    @PostMapping(path = "/upload", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
-    public void create(@Valid NodeRequest request, @RequestPart(value = "file") final MultipartFile file) throws IOException {
+    @PostMapping(path = "/nodes", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
+    public void create(@Valid NodeWithContentRequest request, @RequestPart(value = "file") final MultipartFile file) throws IOException {
 
         final Node node = nodeMapper.toEntity(request);
         FileStoreMetadata fileStoreMetadata = nodeService.buildFileStoreMetadata(node, file);

@@ -9,7 +9,7 @@
         <version>0.0.1-SNAPSHOT</version>
     </parent>
 
-    <groupId>com.trodix.duckcloud.persentation</groupId>
+    <groupId>com.trodix.duckcloud.presentation</groupId>
     <artifactId>duckcloud-server-presentation</artifactId>
 
     <properties>
@@ -22,11 +22,6 @@
         <dependency>
             <groupId>com.trodix.duckcloud.domain</groupId>
             <artifactId>duckcloud-server-domain</artifactId>
-            <version>${project.parent.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.trodix.duckcloud.shared</groupId>
-            <artifactId>duckcloud-server-shared</artifactId>
             <version>${project.parent.version}</version>
         </dependency>
     </dependencies>

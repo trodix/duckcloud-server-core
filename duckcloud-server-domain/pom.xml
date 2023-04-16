@@ -25,8 +25,8 @@
             <version>${project.parent.version}</version>
         </dependency>
         <dependency>
-            <groupId>com.trodix.duckcloud.shared</groupId>
-            <artifactId>duckcloud-server-shared</artifactId>
+            <groupId>com.trodix.duckcloud.security</groupId>
+            <artifactId>duckcloud-server-security</artifactId>
             <version>${project.parent.version}</version>
         </dependency>
         <dependency>

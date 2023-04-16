@@ -1,7 +1,7 @@
-package com.trodix.duckcloud.presentation.security.services;
+package com.trodix.duckcloud.security.services;
 
-import com.trodix.duckcloud.presentation.security.exceptions.InvalidUserException;
-import com.trodix.duckcloud.presentation.security.utils.Claims;
+import com.trodix.duckcloud.security.exceptions.InvalidUserException;
+import com.trodix.duckcloud.security.utils.Claims;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -13,10 +13,11 @@ import org.springframework.stereotype.Service;
 @Slf4j
 public class AuthenticationService {
 
+    public static final String DEFAULT_USER = "System";
+
     public Jwt getJwt() throws RuntimeException {
         Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        if (principal instanceof Jwt) {
-            final Jwt jwt = (Jwt) principal;
+        if (principal instanceof final Jwt jwt) {
             return jwt;
         }
 

@@ -19,12 +19,14 @@
 	<packaging>pom</packaging>
 
     <modules>
+		<module>duckcloud-server-core</module>
         <module>duckcloud-server-persistance</module>
 		<module>duckcloud-server-domain</module>
 		<module>duckcloud-server-presentation</module>
-		<module>duckcloud-server-shared</module>
-		<module>duckcloud-server-core</module>
-	</modules>
+		<module>duckcloud-server-security</module>
+		<module>duckcloud-server-connectors</module>
+		<module>duckcloud-server-connectors-onlyoffice</module>
+    </modules>
 
     <properties>
 		<java.version>17</java.version>
@@ -116,6 +118,11 @@
 				<artifactId>mybatis-spring-boot-starter</artifactId>
 				<version>${mybatis.version}</version>
 			</dependency>
+			<dependency>
+				<groupId>org.apache.commons</groupId>
+				<artifactId>commons-collections4</artifactId>
+				<version>4.4</version>
+			</dependency>
 
 
 			<dependency>
@@ -165,6 +172,33 @@
 						</compilerArg>
 					</compilerArgs>
 				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-enforcer-plugin</artifactId>
+				<version>3.3.0</version>
+				<executions>
+					<execution>
+						<id>enforce</id>
+						<goals>
+							<goal>enforce</goal>
+						</goals>
+						<configuration>
+							<rules>
+								<requireMavenVersion>
+									<version>3.6</version>
+								</requireMavenVersion>
+								<requireJavaVersion>
+									<version>17</version>
+								</requireJavaVersion>
+								<banDuplicatePomDependencyVersions/>
+								<dependencyConvergence>
+									<level>WARN</level>
+								</dependencyConvergence>
+							</rules>
+						</configuration>
+					</execution>
+				</executions>
 			</plugin>
 		</plugins>
 

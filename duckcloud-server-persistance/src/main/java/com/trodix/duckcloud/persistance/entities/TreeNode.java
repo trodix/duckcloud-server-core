@@ -22,6 +22,10 @@ public class TreeNode {
 
     private List<String> nodePath;
 
+    private List<Tag> tags;
+
+    private List<Property> properties;
+
     private List<TreeNode> children = new ArrayList<>();
 
     public void setNodePath(String valuesSeparatedByComma) {

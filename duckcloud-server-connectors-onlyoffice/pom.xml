@@ -9,8 +9,8 @@
         <version>0.0.1-SNAPSHOT</version>
     </parent>
 
-    <groupId>com.trodix.duckcloud.shared</groupId>
-    <artifactId>duckcloud-server-shared</artifactId>
+    <groupId>com.trodix.duckcloud.connectors.onlyoffice</groupId>
+    <artifactId>duckcloud-server-connectors-onlyoffice</artifactId>
 
     <properties>
         <maven.compiler.source>17</maven.compiler.source>
@@ -18,6 +18,12 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
-    <dependencies></dependencies>
+    <dependencies>
+        <dependency>
+            <groupId>com.trodix.duckcloud.presentation</groupId>
+            <artifactId>duckcloud-server-presentation</artifactId>
+            <version>${project.parent.version}</version>
+        </dependency>
+    </dependencies>
 
 </project>

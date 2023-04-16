@@ -1,4 +1,4 @@
-package com.trodix.duckcloud.presentation.security.utils;
+package com.trodix.duckcloud.security.utils;
 
 public enum Claims {
     EMAIL("email"),
@@ -6,7 +6,7 @@ public enum Claims {
 
     public final String value;
 
-    private Claims(final String value) {
+    Claims(final String value) {
         this.value = value;
     }
 

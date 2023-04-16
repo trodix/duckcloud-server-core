@@ -89,5 +89,37 @@
             <column header="name" name="name" type="STRING"/>
         </loadData>
     </changeSet>
+    
+    <changeSet id="add-default-nodes" author="svallet">
+        <insert tableName="nodes">
+            <column name="type_id" value="1" />
+        </insert>
+        <insert tableName="nodes">
+            <column name="parent_id" value="1" />
+            <column name="type_id" value="1" />
+        </insert>
+        <insert tableName="nodes">
+            <column name="parent_id" value="2" />
+            <column name="type_id" value="2" />
+        </insert>
+    </changeSet>
+
+    <changeSet id="add-default-properties" author="svallet">
+        <insert tableName="properties">
+            <column name="node_id" value="1" />
+            <column name="property_name" value="cm:name" />
+            <column name="string_val" value="-root-container-" />
+        </insert>
+        <insert tableName="properties">
+            <column name="node_id" value="2" />
+            <column name="property_name" value="cm:name" />
+            <column name="string_val" value="-root-" />
+        </insert>
+        <insert tableName="properties">
+            <column name="node_id" value="3" />
+            <column name="property_name" value="cm:name" />
+            <column name="string_val" value="Document1.docx" />
+        </insert>
+    </changeSet>
 
 </databaseChangeLog>

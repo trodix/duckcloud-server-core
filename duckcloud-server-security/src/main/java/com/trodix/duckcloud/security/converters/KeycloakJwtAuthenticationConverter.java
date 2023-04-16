@@ -1,4 +1,4 @@
-package com.trodix.duckcloud.presentation.security.converters;
+package com.trodix.duckcloud.security.converters;
 
 import com.nimbusds.jose.shaded.gson.internal.LinkedTreeMap;
 import org.apache.commons.collections4.SetUtils;

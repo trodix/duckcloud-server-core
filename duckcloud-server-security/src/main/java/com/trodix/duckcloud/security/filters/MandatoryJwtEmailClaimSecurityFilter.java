@@ -1,8 +1,8 @@
-package com.trodix.duckcloud.presentation.security.filters;
+package com.trodix.duckcloud.security.filters;
 
-import com.trodix.duckcloud.presentation.security.exceptions.InvalidUserException;
-import com.trodix.duckcloud.presentation.security.services.AuthenticationService;
-import com.trodix.duckcloud.presentation.security.utils.Claims;
+import com.trodix.duckcloud.security.exceptions.InvalidUserException;
+import com.trodix.duckcloud.security.services.AuthenticationService;
+import com.trodix.duckcloud.security.utils.Claims;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpFilter;

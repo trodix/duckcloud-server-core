@@ -38,7 +38,7 @@
 
     <springProfile name="dev">
 
-         <logger name="org.springframework.security" level="DEBUG" />
+         <logger name="org.springframework.security" level="INFO" />
         <!-- <logger name="org.springframework.jdbc.core.JdbcTemplate" level="DEBUG" /> -->
         <!-- <logger name="org.springframework.jdbc.core.StatementCreatorUtils" level="TRACE" /> -->
 
@@ -47,7 +47,10 @@
             <appender-ref ref="Console" />
         </logger> -->
 
-        <logger name="com.trodix.duckcloud" level="DEBUG" />
+        <logger name="com.trodix.duckcloud.persistance.utils" level="TRACE" />
+        <logger name="com.trodix.duckcloud.domain" level="TRACE" />
+        <logger name="com.trodix.duckcloud.presentation" level="TRACE" />
+        <logger name="com.trodix.duckcloud.connectors.onlyoffice" level="TRACE" />
 
     </springProfile>
 

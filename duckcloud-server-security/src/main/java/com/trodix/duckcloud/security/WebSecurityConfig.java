@@ -1,6 +1,6 @@
-package com.trodix.duckcloud.presentation.security;
+package com.trodix.duckcloud.security;
 
-import com.trodix.duckcloud.presentation.security.converters.KeycloakJwtAuthenticationConverter;
+import com.trodix.duckcloud.security.converters.KeycloakJwtAuthenticationConverter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -18,6 +18,7 @@ import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import java.util.Arrays;
+import java.util.List;
 
 @Configuration
 @EnableMethodSecurity(
@@ -53,7 +54,8 @@ public class WebSecurityConfig {
                                 .jwt()
                                 .jwtAuthenticationConverter(keycloakJwtAuthenticationConverter))
                 .authorizeHttpRequests()
-                .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/integration/onlyoffice/**")
+                //.requestMatchers("/swagger-ui/**", "/v3/api-docs/**")
+                .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/api/v1/integration/onlyoffice/**")
                 .permitAll()
                 .anyRequest()
                 .authenticated();
@@ -83,8 +85,8 @@ public class WebSecurityConfig {
         configuration.setAllowedOrigins(Arrays.asList(allowedOrigins));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PATCH", "PUT", "DELETE", "OPTIONS", "HEAD"));
         configuration.setAllowCredentials(true);
-        configuration.setAllowedHeaders(Arrays.asList("*"));
-        configuration.setExposedHeaders(Arrays.asList("X-Get-Header"));
+        configuration.setAllowedHeaders(List.of("*"));
+        configuration.setExposedHeaders(List.of("X-Get-Header"));
         configuration.setMaxAge(3600L);
         final UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);

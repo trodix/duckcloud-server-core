@@ -59,7 +59,7 @@ public class StorageService {
                     .stream(new ByteArrayInputStream(content), content.length, -1)
                     .build();
             final ObjectWriteResponse response = minioClient.putObject(obj);
-            log.debug("Created new object in storage: bucket={} path={}", response.bucket(), response.object());
+            log.debug("Created or updated new object in storage: bucket={} path={}", response.bucket(), response.object());
             return response;
         } catch (final Exception e) {
             throw new RuntimeException(e.getMessage());
