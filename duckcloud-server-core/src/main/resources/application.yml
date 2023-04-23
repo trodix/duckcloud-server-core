@@ -22,3 +22,11 @@ logging:
 springdoc:
   swagger-ui.path: /swagger-ui.html
   show-actuator: true
+
+## Elasticsearch
+app:
+  indexes:
+    synchronization:
+      fixed-delay: 1 # Delay in minutes
+    file-content-indexer:
+      enabled: true # Enable fulltext search on file contents

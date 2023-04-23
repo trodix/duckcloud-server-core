@@ -1,6 +1,8 @@
 package com.trodix.duckcloud.domain.services;
 
 import com.trodix.duckcloud.domain.models.*;
+import com.trodix.duckcloud.domain.search.models.NodeIndex;
+import com.trodix.duckcloud.domain.search.services.NodeIndexerService;
 import com.trodix.duckcloud.domain.utils.ModelUtils;
 import com.trodix.duckcloud.domain.utils.StorageUtils;
 import com.trodix.duckcloud.persistance.dao.NodeManager;
@@ -10,7 +12,7 @@ import com.trodix.duckcloud.persistance.entities.TreeNode;
 import com.trodix.duckcloud.persistance.utils.NodeUtils;
 import com.trodix.duckcloud.security.services.AuthenticationService;
 import io.minio.ObjectWriteResponse;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -21,13 +23,17 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
 @Slf4j
 public class NodeService {
 
     private final NodeManager nodeManager;
 
     private final StorageService storageService;
+
+    private final NodeContentService nodeContentService;
+
+    private final NodeIndexerService nodeIndexerService;
 
     private final AuthenticationService authenticationService;
 
@@ -102,6 +108,16 @@ public class NodeService {
     public void create(Node node) {
         setCreatedAuthorProperties(node);
         nodeManager.create(node);
+        indexNode(node);
+    }
+
+    public void indexNode(Node node) {
+        try {
+            NodeIndex nodeIndex = nodeIndexerService.buildIndex(node);
+            nodeIndexerService.createNodeIndex(nodeIndex);
+        } catch (RuntimeException e) {
+            log.error("Error while indexing node with id {}", node.getId(), e);
+        }
     }
 
     public void createNodeWithContent(Node node, FileStoreMetadata fileStoreMetadata, byte[] file) {
@@ -160,8 +176,10 @@ public class NodeService {
         setModifiedAuthorProperties(node);
         // merge updated properties with existing properties
         Node existingNode = getOne(node.getId()).orElseThrow(() -> new IllegalArgumentException("Trying to update a node not found in database"));
-        NodeUtils.addProperties(node, existingNode.getProperties());
-        nodeManager.update(node);
+        NodeUtils.addProperties(existingNode, node.getProperties());
+        // existingNode object has been updated with new node properties
+        nodeManager.update(existingNode);
+        indexNode(existingNode);
     }
 
     public void setCreatedAuthorProperties(Node node) {
@@ -228,6 +246,13 @@ public class NodeService {
         }
 
         nodeManager.delete(id);
+
+        try {
+            nodeIndexerService.deleteNodeIndex(node.getId());
+        } catch (RuntimeException e) {
+            log.error("Error while trying to remove index for nodeId {}", node.getId(), e);
+        }
+
     }
 
     public FileStoreMetadata buildFileStoreMetadata(Node node, MultipartFile file) {

@@ -12,7 +12,7 @@ import io.minio.messages.Bucket;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.annotation.security.RolesAllowed;
 import jakarta.validation.Valid;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Scope;
 import org.springframework.core.io.ByteArrayResource;
@@ -30,7 +30,7 @@ import java.util.List;
 @RestController
 @Scope(WebApplicationContext.SCOPE_REQUEST)
 @RequestMapping("/api/v1/storage")
-@AllArgsConstructor
+@RequiredArgsConstructor
 @Slf4j
 @RolesAllowed({"ecm-user"})
 public class StorageController {

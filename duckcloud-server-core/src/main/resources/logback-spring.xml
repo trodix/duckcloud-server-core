@@ -47,9 +47,9 @@
             <appender-ref ref="Console" />
         </logger> -->
 
-        <logger name="com.trodix.duckcloud.persistance.utils" level="TRACE" />
-        <logger name="com.trodix.duckcloud.domain" level="TRACE" />
-        <logger name="com.trodix.duckcloud.presentation" level="TRACE" />
+        <logger name="com.trodix.duckcloud.persistance.utils" level="INFO" />
+        <logger name="com.trodix.duckcloud.domain" level="INFO" />
+        <logger name="com.trodix.duckcloud.presentation" level="INFO" />
         <logger name="com.trodix.duckcloud.connectors.onlyoffice" level="TRACE" />
 
     </springProfile>

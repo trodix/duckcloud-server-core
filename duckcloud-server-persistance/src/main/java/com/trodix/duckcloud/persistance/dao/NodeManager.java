@@ -6,9 +6,10 @@ import com.trodix.duckcloud.persistance.dao.mappers.TagMapper;
 import com.trodix.duckcloud.persistance.dao.mappers.TypeMapper;
 import com.trodix.duckcloud.persistance.entities.*;
 import com.trodix.duckcloud.persistance.utils.NodeUtils;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.ibatis.session.RowBounds;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -17,7 +18,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
 @Slf4j
 public class NodeManager {
 
@@ -38,6 +39,17 @@ public class NodeManager {
         return nodeMapper.findAll();
     }
 
+    public List<Node> findAll(int currentPage, int itemsPerPage) {
+        int offset = (currentPage - 1) * itemsPerPage;
+        RowBounds rowBounds;
+        if(currentPage == 0){
+            rowBounds = new RowBounds();
+        } else {
+            rowBounds = new RowBounds(currentPage, itemsPerPage);
+        }
+        return nodeMapper.findAllPageable(rowBounds);
+    }
+
     public List<Node> findAllByNodeId(List<Long> ids) {
         return nodeMapper.findAllByNodeId(ids);
     }
@@ -56,6 +68,10 @@ public class NodeManager {
 
     public List<Property> findSavedPropertiesForNode(Node node) {
         return propertyMapper.findAllByNodeId(node.getId());
+    }
+
+    public long count() {
+        return nodeMapper.count();
     }
 
     @Transactional

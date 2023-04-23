@@ -59,6 +59,10 @@
         <include refid="select_node" />
     </select>
 
+    <select id="findAllPageable" resultMap="result_Node">
+        <include refid="select_node" />
+    </select>
+
     <select id="findTreeNodesByParentId" resultMap="result_TreeNode">
         WITH RECURSIVE node_result as (
             SELECT
@@ -93,6 +97,10 @@
     <select id="findAllByParentId" resultMap="result_Node">
         <include refid="select_node" />
         WHERE n.parent_id = #{parentId}
+    </select>
+
+    <select id="count" resultType="java.lang.Long">
+        SELECT COUNT(n.id) FROM nodes n
     </select>
 
     <insert id="insert" useGeneratedKeys="true" keyProperty="id" keyColumn="id">

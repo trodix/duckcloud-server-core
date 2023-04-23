@@ -4,7 +4,7 @@ import com.trodix.duckcloud.domain.services.TypeService;
 import com.trodix.duckcloud.persistance.entities.Type;
 import com.trodix.duckcloud.presentation.dto.mappers.TypeMapper;
 import com.trodix.duckcloud.presentation.dto.requests.TypeRequest;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
@@ -12,7 +12,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/types")
-@AllArgsConstructor
+@RequiredArgsConstructor
 @Slf4j
 public class TypeController {
 

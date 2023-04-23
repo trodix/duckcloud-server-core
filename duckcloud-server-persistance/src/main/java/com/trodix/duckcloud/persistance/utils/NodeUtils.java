@@ -6,9 +6,8 @@ import com.trodix.duckcloud.persistance.entities.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.io.Serializable;
+import java.util.*;
 
 @Slf4j
 public class NodeUtils {
@@ -52,8 +51,8 @@ public class NodeUtils {
         }
 
         if (hasProperty(node, property.getPropertyName())) {
-            removeProperty(node.getProperties(), property.getPropertyName());
             Property currentProperty = getProperty(node.getProperties(), property.getPropertyName()).orElse(property);
+            removeProperty(node.getProperties(), property.getPropertyName());
             property.setId(currentProperty.getId());
             addProperty(node, property);
         } else {
@@ -82,6 +81,27 @@ public class NodeUtils {
         }
 
         return false;
+    }
+
+    public static Map<String, Serializable> toMapProperties(List<Property> properties) {
+        Map<String, Serializable> target = new HashMap<>();
+
+        for (Property property : properties) {
+            String key = property.getPropertyName();
+
+            if (property.getStringVal() != null) {
+                target.put(key, property.getStringVal());
+            } else if (property.getLongVal() != null) {
+                target.put(key, property.getLongVal());
+            } else if (property.getDoubleVal() != null) {
+                target.put(key, property.getDoubleVal());
+            } else if (property.getDateVal() != null) {
+                target.put(key, property.getDateVal());
+            }
+
+        }
+
+        return target;
     }
 
 }

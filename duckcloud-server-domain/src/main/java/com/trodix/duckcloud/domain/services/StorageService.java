@@ -3,7 +3,7 @@ package com.trodix.duckcloud.domain.services;
 import com.trodix.duckcloud.domain.models.FileStoreMetadata;
 import io.minio.*;
 import io.minio.messages.Bucket;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.compress.utils.IOUtils;
 import org.springframework.stereotype.Service;
@@ -19,7 +19,7 @@ import java.util.List;
 import java.util.UUID;
 
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
 @Slf4j
 public class StorageService {
 

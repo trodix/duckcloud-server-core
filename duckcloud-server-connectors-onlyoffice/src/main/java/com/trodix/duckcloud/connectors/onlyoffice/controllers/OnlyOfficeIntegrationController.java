@@ -6,7 +6,6 @@ import com.trodix.duckcloud.domain.models.ContentModel;
 import com.trodix.duckcloud.domain.models.FileLocationParts;
 import com.trodix.duckcloud.domain.models.FileStoreMetadata;
 import com.trodix.duckcloud.domain.services.NodeService;
-import com.trodix.duckcloud.domain.services.StorageService;
 import com.trodix.duckcloud.domain.utils.StorageUtils;
 import com.trodix.duckcloud.persistance.entities.Node;
 import com.trodix.duckcloud.persistance.entities.Property;
@@ -14,7 +13,7 @@ import com.trodix.duckcloud.persistance.utils.NodeUtils;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.HttpStatus;
@@ -29,7 +28,7 @@ import java.net.URL;
 import java.util.Optional;
 
 @RestController
-@AllArgsConstructor
+@RequiredArgsConstructor
 @Slf4j
 @RequestMapping("/api/v1/integration/onlyoffice")
 public class OnlyOfficeIntegrationController {
