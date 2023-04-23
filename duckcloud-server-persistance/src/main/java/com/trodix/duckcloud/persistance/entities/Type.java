@@ -8,4 +8,8 @@ public class Type {
     private long id;
     private String name;
 
+    public String toString() {
+        return this.name;
+    }
+
 }

@@ -9,8 +9,9 @@
         <version>0.0.1-SNAPSHOT</version>
     </parent>
 
-    <groupId>com.trodix.duckcloud.connectors</groupId>
-    <artifactId>duckcloud-server-connectors</artifactId>
+    <groupId>com.trodix.duckcloud.connectors.finance</groupId>
+    <artifactId>duckcloud-server-connectors-finance</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
 
     <properties>
         <maven.compiler.source>17</maven.compiler.source>
@@ -20,15 +21,16 @@
 
     <dependencies>
         <dependency>
-            <groupId>com.trodix.duckcloud.connectors.onlyoffice</groupId>
-            <artifactId>duckcloud-server-connectors-onlyoffice</artifactId>
-            <version>0.0.1-SNAPSHOT</version>
+            <groupId>com.trodix.duckcloud.presentation</groupId>
+            <artifactId>duckcloud-server-presentation</artifactId>
+            <version>${project.parent.version}</version>
         </dependency>
+
         <dependency>
-            <groupId>com.trodix.duckcloud.connectors.finance</groupId>
-            <artifactId>duckcloud-server-connectors-finance</artifactId>
-            <version>0.0.1-SNAPSHOT</version>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-aop</artifactId>
         </dependency>
+
     </dependencies>
 
 </project>

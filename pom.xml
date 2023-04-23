@@ -26,6 +26,7 @@
 		<module>duckcloud-server-security</module>
 		<module>duckcloud-server-connectors</module>
 		<module>duckcloud-server-connectors-onlyoffice</module>
+        <module>duckcloud-server-connectors-finance</module>
     </modules>
 
     <properties>
