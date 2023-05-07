@@ -1,10 +1,12 @@
 package com.trodix.duckcloud.security;
 
 import com.trodix.duckcloud.security.converters.KeycloakJwtAuthenticationConverter;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Scope;
+import org.springframework.core.annotation.Order;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -20,7 +22,9 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import java.util.Arrays;
 import java.util.List;
 
+@Order(99)
 @Configuration
+@RequiredArgsConstructor
 @EnableMethodSecurity(
         securedEnabled = true,
         jsr250Enabled = true)
@@ -31,16 +35,13 @@ public class WebSecurityConfig {
     @Value("${app.auth.allowed-origins}")
     private String[] allowedOrigins;
 
-    public WebSecurityConfig(final KeycloakJwtAuthenticationConverter keycloakJwtAuthenticationConverter) {
-        this.keycloakJwtAuthenticationConverter = keycloakJwtAuthenticationConverter;
-    }
-
     @Bean
     public SessionAuthenticationStrategy sessionAuthenticationStrategy() {
         return new NullAuthenticatedSessionStrategy();
     }
 
     @Bean
+    @Order(99)
     public SecurityFilterChain filterChain(final HttpSecurity http) throws Exception {
 
         http.cors();
@@ -54,8 +55,7 @@ public class WebSecurityConfig {
                                 .jwt()
                                 .jwtAuthenticationConverter(keycloakJwtAuthenticationConverter))
                 .authorizeHttpRequests()
-                //.requestMatchers("/swagger-ui/**", "/v3/api-docs/**")
-                .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/api/v1/integration/onlyoffice/**")
+                .requestMatchers("/swagger-ui/**", "/v3/api-docs/**")
                 .permitAll()
                 .anyRequest()
                 .authenticated();

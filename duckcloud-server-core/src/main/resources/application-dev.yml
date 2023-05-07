@@ -18,3 +18,8 @@ app:
     endpoint: http://127.0.0.1:9000
     accessKey: SykAM0TXTf3OVp5j
     secretKey: JI4xH7DoE3q4GWlpomjiq3l6lkTn2xVS
+  onlyoffice:
+    jwt:
+      secret: WlEJf7hdzCEGwTWkO89i
+  server:
+    public-base-url: "http://trodix.local:8010"

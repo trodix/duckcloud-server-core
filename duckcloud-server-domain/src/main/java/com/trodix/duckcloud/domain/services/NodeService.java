@@ -14,6 +14,7 @@ import com.trodix.duckcloud.security.services.AuthenticationService;
 import io.minio.ObjectWriteResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -106,6 +107,9 @@ public class NodeService {
     }
 
     public void create(Node node) {
+        if (!hasName(node)) {
+            throw new IllegalArgumentException("Property " + ContentModel.PROP_NAME + " was not found");
+        }
         setCreatedAuthorProperties(node);
         nodeManager.create(node);
         indexNode(node);
@@ -158,6 +162,10 @@ public class NodeService {
 
         if (!ModelUtils.isContentType(node)) {
             throw new IllegalArgumentException("Node should be of type " + ContentModel.TYPE_CONTENT);
+        }
+
+        if (!hasName(node)) {
+            throw new IllegalArgumentException("Property " + ContentModel.PROP_NAME + " was not found");
         }
 
         Optional<Property> optionalContentLocation = NodeUtils.getProperty(node.getProperties(), ContentModel.PROP_CONTENT_LOCATION);
@@ -287,6 +295,10 @@ public class NodeService {
         byte[] file = storageService.getFile(fileLocationParts.getBucket(), fileLocationParts.getPath());
 
         return file;
+    }
+
+    private boolean hasName(Node node) {
+        return !StringUtils.isBlank(NodeUtils.getProperty(node.getProperties(), ContentModel.PROP_NAME).orElse(new Property()).getStringVal());
     }
 
 }

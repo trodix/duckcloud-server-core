@@ -29,16 +29,16 @@ public class MandatoryJwtEmailClaimSecurityFilter extends HttpFilter {
     protected void doFilter(final HttpServletRequest request, final HttpServletResponse response, final FilterChain chain)
             throws IOException, ServletException {
 
-        try {
-            authService.getEmail();
-        } catch (InvalidUserException e) {
-            log.info("The JWT token did not contained the mandatory {} claim.", Claims.EMAIL.value);
-            response.setContentType(MediaType.APPLICATION_JSON_VALUE);
-            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            return;
-        } catch (RuntimeException e) {
-            // case when no security on the requested url
-        }
+//        try {
+//            authService.getEmail();
+//        } catch (InvalidUserException e) {
+//            log.info("The JWT token did not contained the mandatory {} claim.", Claims.EMAIL.value);
+//            response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+//            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+//            return;
+//        } catch (RuntimeException e) {
+//            // case when no security on the requested url
+//        }
 
         chain.doFilter(request, response);
     }

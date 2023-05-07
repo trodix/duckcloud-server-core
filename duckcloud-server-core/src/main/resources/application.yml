@@ -27,6 +27,11 @@ springdoc:
 app:
   indexes:
     synchronization:
-      fixed-delay: 1 # Delay in minutes
+      fixed-delay: 120 # Delay in minutes
     file-content-indexer:
       enabled: true # Enable fulltext search on file contents
+  onlyoffice:
+    jwt:
+      secret: ""
+  server:
+    public-base-url: "http://trodix.local:8010"

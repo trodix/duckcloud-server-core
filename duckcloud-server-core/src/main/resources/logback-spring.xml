@@ -38,7 +38,7 @@
 
     <springProfile name="dev">
 
-         <logger name="org.springframework.security" level="INFO" />
+         <logger name="org.springframework.security" level="DEBUG" />
         <!-- <logger name="org.springframework.jdbc.core.JdbcTemplate" level="DEBUG" /> -->
         <!-- <logger name="org.springframework.jdbc.core.StatementCreatorUtils" level="TRACE" /> -->
 
