@@ -86,9 +86,9 @@ public class OnlyOfficeIntegrationController {
                     break;
                 }
                 String[] keyParts = data.getKey().split("_");
-                String nodeId = keyParts[1];
-                double version = Double.valueOf(keyParts[2]);
-                onlyOfficeService.updateDocument(nodeId, version, data.getUrl());
+                String nodeId = keyParts[0];
+                String revision = keyParts[1];
+                onlyOfficeService.updateDocument(nodeId, revision, data.getUrl());
                 break;
             default:
                 break;

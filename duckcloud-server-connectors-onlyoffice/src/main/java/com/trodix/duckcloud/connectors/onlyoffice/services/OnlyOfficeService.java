@@ -32,6 +32,9 @@ import org.springframework.web.server.ResponseStatusException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.text.DateFormat;
+import java.time.OffsetDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Map;
 
 @RestController
@@ -73,7 +76,7 @@ public class OnlyOfficeService {
 
         String filename = NodeUtils.getProperty(node.getProperties(), ContentModel.PROP_NAME).orElseThrow().getStringVal();
         String fileExt = FilenameUtils.getExtension(filename);
-        String key = "node_" + node.getId() + "_1.0";
+        String key = generateOnlyOfficeDocumentKey(node);
         String documentType = getOnlyOfficeDocumentType(fileExt).toString().toLowerCase();
         String downloadUrl = serverPublicBaseUrl + "/api/v1/integration/onlyoffice/document/" + nodeId + "/contents";
         String callbackUrl = serverPublicBaseUrl + "/api/v1/integration/onlyoffice/document";
@@ -108,11 +111,12 @@ public class OnlyOfficeService {
         return config;
     }
 
-    public void updateDocument(String nodeId, double version, String url) {
-        log.debug("Updating document (nodeId={} version={}) from url: {}", nodeId, version, url);
+    public void updateDocument(String nodeId, String revision, String url) {
+        log.debug("Updating document (nodeId={} revision={}) from url: {}", nodeId, revision, url);
 
         Node node = nodeService.getOne(Long.valueOf(nodeId)).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Node not found for nodeId " + nodeId));
         String contentLocation = NodeUtils.getProperty(node.getProperties(), ContentModel.PROP_CONTENT_LOCATION).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Property: " + ContentModel.PROP_CONTENT_LOCATION + " not found for nodeId " + nodeId)).getStringVal();
+        String documentName = NodeUtils.getProperty(node.getProperties(), ContentModel.PROP_NAME).orElseThrow(() -> new IllegalStateException("Property " + ContentModel.PROP_NAME + " not fount on nodeId " + node.getId())).getStringVal();
         FileLocationParts parts = StorageUtils.getFileLocationParts(contentLocation);
         String documentId;
 
@@ -130,11 +134,21 @@ public class OnlyOfficeService {
             fileStoreMetadata.setContentType("application/vnd.openxmlformats-officedocument.wordprocessingml.document"); // FIXME
             fileStoreMetadata.setUuid(documentId);
             fileStoreMetadata.setBucket(parts.getBucket());
+            fileStoreMetadata.setOriginalName(documentName);
 
             nodeService.updateNodeContent(node, fileStoreMetadata, is.readAllBytes());
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    private String generateOnlyOfficeDocumentKey(Node node) {
+        OffsetDateTime createdAt = NodeUtils.getProperty(node.getProperties(), ContentModel.PROP_CREATED_AT).orElseThrow().getDateVal();
+        OffsetDateTime modifiedAt = NodeUtils.getProperty(node.getProperties(), ContentModel.PROP_MODIFIED_AT).orElseThrow().getDateVal();
+        OffsetDateTime lastModified = modifiedAt == null ? createdAt : modifiedAt;
+        DateTimeFormatter df = DateTimeFormatter.ofPattern("yyyyMMddHHmmss");
+        String lastModifiedFormatted = df.format(lastModified);
+        return String.format("%s_%s", node.getId(), lastModifiedFormatted);
     }
 
     private OnlyOfficeDocumentType getOnlyOfficeDocumentType(String extension) {

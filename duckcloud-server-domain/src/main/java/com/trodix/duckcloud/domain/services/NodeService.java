@@ -181,6 +181,9 @@ public class NodeService {
     }
 
     public void update(Node node) {
+        if (!hasName(node)) {
+            throw new IllegalArgumentException("Property " + ContentModel.PROP_NAME + " was not found");
+        }
         setModifiedAuthorProperties(node);
         // merge updated properties with existing properties
         Node existingNode = getOne(node.getId()).orElseThrow(() -> new IllegalArgumentException("Trying to update a node not found in database"));
@@ -213,14 +216,13 @@ public class NodeService {
         String userId;
         String userName;
 
-        try {
-            userId = authenticationService.getUserId();
-            userName = authenticationService.getName();
-        } catch (RuntimeException e) {
-            // FIXME is not authenticated (onlyoffice public endpoint)
-            userId = AuthenticationService.DEFAULT_USER;
-            userName = AuthenticationService.DEFAULT_USER;
-        }
+        userId = authenticationService.getUserId();
+        userName = authenticationService.getName();
+
+        // FIXME is not authenticated (onlyoffice public endpoint)
+        userId = userId == null ? AuthenticationService.DEFAULT_USER : userId;
+        userName = userName == null ? AuthenticationService.DEFAULT_USER : userName;
+
 
         final Property modifiedAtProp = new Property();
         modifiedAtProp.setPropertyName(ContentModel.PROP_MODIFIED_AT);

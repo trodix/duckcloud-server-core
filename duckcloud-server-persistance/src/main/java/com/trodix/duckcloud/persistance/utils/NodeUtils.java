@@ -77,7 +77,7 @@ public class NodeUtils {
         } else if (p1.getDoubleVal() != null && p2.getDoubleVal() != null) {
             return p1.getDoubleVal() == p2.getDoubleVal();
         } else if (p1.getDateVal() != null && p2.getDateVal() != null) {
-            return p1.getDateVal() != p2.getDateVal();
+            return p1.getDateVal() == p2.getDateVal();
         }
 
         return false;
