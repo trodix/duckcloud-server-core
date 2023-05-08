@@ -25,7 +25,7 @@ public class OnlyOfficeSecurityConfig {
 
     @Bean
     public SecurityFilterChain onlyOfficeFilter(final HttpSecurity http, final AuthenticationManager onlyOfficeAuthManager) throws Exception {
-        // FIXME
+
         http.authorizeHttpRequests()
                 .requestMatchers("/api/v1/integration/onlyoffice/**")
                 .authenticated()

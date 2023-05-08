@@ -11,7 +11,21 @@ spring:
       resourceserver:
         jwt:
           issuer-uri: http://localhost:8080/realms/market
+      client:
+        provider:
+          market:
+            token-uri: http://localhost:8080/realms/market/protocol/openid-connect/token
+        registration:
+          market:
+            authorization-grant-type: client_credentials
+            client-id: duckcloud-webservice
+            client-secret: mqZqOOLh9pUEXNclDI7k9Lz1AymXptWE
+
 app:
+  client:
+    registration:
+      name: market
+      keycloak-admin-uri: http://localhost:8080/admin/realms/market
   auth:
     allowed-origins: http://localhost:4200
   storage:

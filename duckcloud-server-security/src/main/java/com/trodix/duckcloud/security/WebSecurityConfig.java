@@ -47,6 +47,8 @@ public class WebSecurityConfig {
         http.cors();
         http.csrf().disable();
 
+        http.oauth2Client();
+
         // OAUTH authentication
         http.authorizeHttpRequests()
                 .and()

@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 public class AuthenticationService {
 
     public static final String DEFAULT_USER = "System";
+    public static final String DEFAULT_EMAIL = "system@localhost";
 
     public Jwt getJwt() throws RuntimeException {
         Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
