@@ -24,4 +24,6 @@ public interface NodeMapper  {
 
     List<NodeResponse> toDto2(List<NodeWithPath> node);
 
+    NodeResponse toDto2(NodeWithPath node);
+
 }

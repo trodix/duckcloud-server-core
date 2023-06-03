@@ -1,5 +1,7 @@
 package com.trodix.duckcloud.presentation.controllers;
 
+import com.trodix.duckcloud.domain.models.NodePath;
+import com.trodix.duckcloud.domain.models.NodeWithPath;
 import com.trodix.duckcloud.domain.services.NodeService;
 import com.trodix.duckcloud.persistance.entities.Node;
 import com.trodix.duckcloud.presentation.dto.mappers.NodeMapper;
@@ -29,10 +31,8 @@ public class NodeController {
     private final TreeNodeMapper treeNodeMapper;
 
     @GetMapping("/{id}")
-    public NodeResponse getOne(@PathVariable Long id) {
-        Node result = nodeService.getOne(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Node not found for id " + id));
-        NodeResponse response = nodeMapper.toDto(result);
-        return response;
+    public NodeResponse getOneWithParentRecursive(@PathVariable Long id) {
+        return nodeMapper.toDto2(nodeService.getOneNodeWithRecursiveParents(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Node not found for id " + id)));
     }
 
     @GetMapping("")
@@ -43,11 +43,11 @@ public class NodeController {
     }
 
     @GetMapping("/tree/{parentId}")
-    public List<TreeNodeResponse> getTree(@PathVariable Long parentId, @RequestParam int nodeLevel) {
-        return treeNodeMapper.toDto(nodeService.buildTreeFromParent(parentId, nodeLevel));
+    public List<TreeNodeResponse> getTreePrimaryChildren(@PathVariable Long parentId) {
+        return treeNodeMapper.toDto(nodeService.buildTreeFromParent(parentId));
     }
 
-    @GetMapping("/children/{parentId}")
+    @GetMapping("/{parentId}/children")
     public List<NodeResponse> getChildren(@PathVariable Long parentId) {
         return nodeMapper.toDto2(nodeService.getChildrenWithPath(parentId));
     }

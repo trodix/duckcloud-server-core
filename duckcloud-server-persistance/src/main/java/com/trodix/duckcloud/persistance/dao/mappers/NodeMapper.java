@@ -16,7 +16,9 @@ public interface NodeMapper {
 
     List<Node> findAll();
 
-    List<TreeNode> findTreeNodesByParentId(@Param("parentId") Long parentId, @Param("nodeLevel") int nodeLevel);
+    List<TreeNode> findTreeNodesByParentId(@Param("parentId") Long parentId);
+
+    List<TreeNode> findRecursiveNodeParents(@Param("nodeId") Long nodeId);
 
     List<Node> findAllByNodeId(@Param("ids") List<Long> ids);
 

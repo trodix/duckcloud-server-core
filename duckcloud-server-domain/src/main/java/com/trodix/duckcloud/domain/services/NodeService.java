@@ -20,6 +20,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
@@ -51,7 +52,7 @@ public class NodeService {
     }
 
     public List<NodeWithPath> getChildrenWithPath(Long id) {
-        List<String> path = nodeManager.buildTreeFromParent(id, 0).stream().map(tn -> tn.getNodePath()).toList().get(0);
+        List<String> path = nodeManager.buildTreeFromParent(id).stream().map(tn -> tn.getNodePath()).toList().get(0);
         List<Node> parentNodes = nodeManager.findAllByNodeId(path.stream().map(p -> Long.valueOf(p)).toList());
         List<NodePath> pathObj = parentNodes.stream().map(n -> new NodePath(n.getId(), NodeUtils.getProperty(n.getProperties(), ContentModel.PROP_NAME).get().getStringVal())).toList();
         return getChildren(id).stream().map(n -> {
@@ -67,9 +68,32 @@ public class NodeService {
         }).toList();
     }
 
-    public List<TreeNode> buildTreeFromParent(Long parentId, int nodeLevel) {
+    public Optional<NodeWithPath> getOneNodeWithRecursiveParents(Long nodeId) {
+        List<TreeNode> treeNodeList = nodeManager.buildTreeWithRecursiveParents(nodeId);
+        TreeNode treeNode = treeNodeList.stream().findFirst().orElseThrow();
+        Node n = getOne(treeNode.getNodeId()).orElseThrow();
 
-        List<TreeNode> treeNodeList = nodeManager.buildTreeFromParent(parentId, nodeLevel);
+        NodeWithPath nodeWithPath = new NodeWithPath();
+        nodeWithPath.setId(n.getId());
+        nodeWithPath.setParentId(n.getParentId());
+        nodeWithPath.setType(n.getType());
+        nodeWithPath.setTags(n.getTags());
+        nodeWithPath.setProperties(n.getProperties());
+
+        List<Node> parents = nodeManager.findAllByNodeId(treeNode.getNodePath().stream().map(i -> Long.valueOf(i)).toList());
+
+        List<NodePath> pathObj = parents.stream().map(parent ->
+            new NodePath(parent.getId(), NodeUtils.getProperty(parent.getProperties(), ContentModel.PROP_NAME).map(p -> p.getStringVal()).orElse(""))
+        ).toList();
+
+        nodeWithPath.setPath(pathObj);
+
+        return Optional.ofNullable(nodeWithPath);
+    }
+
+    public List<TreeNode> buildTreeFromParent(Long parentId) {
+
+        List<TreeNode> treeNodeList = nodeManager.buildTreeFromParent(parentId);
 
         // associate node properties to tree items
         List<Long> nodeIdsInTree = treeNodeList.stream().map(n -> n.getNodeId()).toList();

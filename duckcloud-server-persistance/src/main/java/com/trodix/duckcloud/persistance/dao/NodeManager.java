@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
@@ -51,15 +52,23 @@ public class NodeManager {
     }
 
     public List<Node> findAllByNodeId(List<Long> ids) {
-        return nodeMapper.findAllByNodeId(ids);
+        List<Node> result = nodeMapper.findAllByNodeId(ids);
+        
+        result.sort(Comparator.comparing(parent -> ids.indexOf(parent.getId())));
+
+        return result;
     }
 
     public List<Node> findAllByParentId(Long parentId) {
         return nodeMapper.findAllByParentId(parentId);
     }
 
-    public List<TreeNode> buildTreeFromParent(Long parentId, int nodeLevel) {
-        return nodeMapper.findTreeNodesByParentId(parentId, nodeLevel);
+    public List<TreeNode> buildTreeFromParent(Long parentId) {
+        return nodeMapper.findTreeNodesByParentId(parentId);
+    }
+
+    public List<TreeNode> buildTreeWithRecursiveParents(Long nodeId) {
+        return nodeMapper.findRecursiveNodeParents(nodeId);
     }
 
     public List<Tag> findSavedTagsForNode(Node node) {

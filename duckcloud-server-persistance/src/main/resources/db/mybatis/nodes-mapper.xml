@@ -86,6 +86,20 @@
         ) SELECT * FROM node_result;
     </select>
 
+    <select id="findRecursiveNodeParents" resultMap="result_TreeNode">
+        WITH RECURSIVE nodes_rec(id, parent_id, node_level, node_path) AS (
+            SELECT tn.id, tn.parent_id, 1::INT AS node_level, tn.id::TEXT AS node_path
+            FROM nodes AS tn
+            WHERE tn.parent_id IS NULL
+        UNION ALL
+            SELECT c.id, c.parent_id, p.node_level + 1 AS node_level,
+                (p.node_path || ',' || c.id::TEXT)
+            FROM nodes_rec AS p, nodes AS c
+            WHERE c.parent_id = p.id
+        )
+        SELECT * FROM nodes_rec AS n WHERE n.id = #{nodeId};
+    </select>
+
     <select id="findAllByNodeId" resultMap="result_Node">
         <include refid="select_node" />
         WHERE n.id IN
