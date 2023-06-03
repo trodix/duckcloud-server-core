@@ -1,5 +1,9 @@
 # Duckcloud Server
 
+## File explorer
+
+<img src="./docs/images/file_explorer_1.png"/>
+
 ## Search API
 
 ### Elasticsearch Queries
