@@ -58,7 +58,7 @@ public class NodeIndexerService {
         final List<Future<?>> runningTasks = new ArrayList<>();
 
         for (int pageIndex = 0; pageIndex < pageCount; pageIndex++) {
-            final List<Node> page = nodeManager.findAll(0, 100);
+            final List<Node> page = nodeManager.findAllTypeContent(0, 100);
 
             final List<NodeIndex> nodeIndexChunk = page.stream().map(this::buildIndex).toList();
 

@@ -2,6 +2,8 @@ package com.trodix.duckcloud.persistance.dao.mappers;
 
 import com.trodix.duckcloud.persistance.entities.Node;
 import com.trodix.duckcloud.persistance.entities.TreeNode;
+import com.trodix.duckcloud.security.annotations.FilterAuthorized;
+import com.trodix.duckcloud.security.models.PermissionType;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.session.RowBounds;
@@ -22,9 +24,10 @@ public interface NodeMapper {
 
     List<Node> findAllByNodeId(@Param("ids") List<Long> ids);
 
+    @FilterAuthorized(permissionType = PermissionType.READ)
     List<Node> findAllByParentId(Long parentId);
 
-    List<Node> findAllPageable(RowBounds rowbounds);
+    List<Node> findAllTypeContentPageable(RowBounds rowbounds);
 
     long count();
 

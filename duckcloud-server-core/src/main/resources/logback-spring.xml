@@ -50,10 +50,15 @@
             <appender-ref ref="Console" />
         </logger> -->
 
+        <logger name="org.mybatis" level="WARN" />
+
         <logger name="com.trodix.duckcloud.persistance" level="INFO" />
         <logger name="com.trodix.duckcloud.domain" level="INFO" />
         <logger name="com.trodix.duckcloud.presentation" level="INFO" />
-        <logger name="com.trodix.duckcloud.connectors.onlyoffice" level="DEBUG" />
+        <logger name="com.trodix.duckcloud.security.services.PermissionService" level="INFO" />
+        <logger name="com.trodix.duckcloud.security.annotations" level="INFO" />
+        <logger name="com.trodix.duckcloud.security.persistance" level="INFO" />
+        <logger name="com.trodix.duckcloud.connectors.onlyoffice" level="INFO" />
 
     </springProfile>
 

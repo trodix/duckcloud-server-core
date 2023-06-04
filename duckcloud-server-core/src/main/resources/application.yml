@@ -13,8 +13,8 @@ spring:
 
 mybatis:
   config-location: classpath:db/mybatis/mybatis-config.xml
-  mapper-locations: classpath:db/mybatis/*-mapper.xml
-  type-aliases-package: com.trodix.duckcloud.persistance.entities
+  mapper-locations: classpath*:db/mybatis/**/*-mapper.xml
+  type-aliases-package: com.trodix.duckcloud.**.entities
 
 ### Allow Spring Boot Admin to display logs on /admin/instances/<INSTANCE>/logfile
 # Must be same path as in logback-spring.xml

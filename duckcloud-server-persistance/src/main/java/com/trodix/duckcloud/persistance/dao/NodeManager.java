@@ -40,7 +40,7 @@ public class NodeManager {
         return nodeMapper.findAll();
     }
 
-    public List<Node> findAll(int currentPage, int itemsPerPage) {
+    public List<Node> findAllTypeContent(int currentPage, int itemsPerPage) {
         int offset = (currentPage - 1) * itemsPerPage;
         RowBounds rowBounds;
         if(currentPage == 0){
@@ -48,7 +48,7 @@ public class NodeManager {
         } else {
             rowBounds = new RowBounds(currentPage, itemsPerPage);
         }
-        return nodeMapper.findAllPageable(rowBounds);
+        return nodeMapper.findAllTypeContentPageable(rowBounds);
     }
 
     public List<Node> findAllByNodeId(List<Long> ids) {
