@@ -6,11 +6,11 @@ import com.trodix.duckcloud.domain.search.services.NodeIndexerService;
 import com.trodix.duckcloud.domain.utils.ModelUtils;
 import com.trodix.duckcloud.domain.utils.StorageUtils;
 import com.trodix.duckcloud.persistance.dao.NodeManager;
-import com.trodix.duckcloud.persistance.entities.Node;
-import com.trodix.duckcloud.persistance.entities.Property;
-import com.trodix.duckcloud.persistance.entities.TreeNode;
+import com.trodix.duckcloud.persistance.entities.*;
 import com.trodix.duckcloud.persistance.utils.NodeUtils;
+import com.trodix.duckcloud.security.persistance.entities.*;
 import com.trodix.duckcloud.security.services.AuthenticationService;
+import com.trodix.duckcloud.security.services.PermissionService;
 import io.minio.ObjectWriteResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -20,7 +20,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
@@ -38,6 +37,8 @@ public class NodeService {
     private final NodeIndexerService nodeIndexerService;
 
     private final AuthenticationService authenticationService;
+
+    private final PermissionService permissionService;
 
     public Optional<Node> getOne(Long id) {
         return nodeManager.findOne(id);
@@ -83,7 +84,7 @@ public class NodeService {
         List<Node> parents = nodeManager.findAllByNodeId(treeNode.getNodePath().stream().map(i -> Long.valueOf(i)).toList());
 
         List<NodePath> pathObj = parents.stream().map(parent ->
-            new NodePath(parent.getId(), NodeUtils.getProperty(parent.getProperties(), ContentModel.PROP_NAME).map(p -> p.getStringVal()).orElse(""))
+                new NodePath(parent.getId(), NodeUtils.getProperty(parent.getProperties(), ContentModel.PROP_NAME).map(p -> p.getStringVal()).orElse(""))
         ).toList();
 
         nodeWithPath.setPath(pathObj);
@@ -136,6 +137,10 @@ public class NodeService {
         }
         setCreatedAuthorProperties(node);
         nodeManager.create(node);
+
+        Permission permission = buildDefaultPermissionForNode(node.getId());
+        permissionService.createPermission(permission);
+
         indexNode(node);
     }
 
@@ -237,16 +242,11 @@ public class NodeService {
 
     public void setModifiedAuthorProperties(Node node) {
 
-        String userId;
-        String userName;
+        String userId = authenticationService.getUserId();
+        String userName = authenticationService.getName();
 
-        userId = authenticationService.getUserId();
-        userName = authenticationService.getName();
-
-        // FIXME is not authenticated (onlyoffice public endpoint)
         userId = userId == null ? AuthenticationService.DEFAULT_USER : userId;
         userName = userName == null ? AuthenticationService.DEFAULT_USER : userName;
-
 
         final Property modifiedAtProp = new Property();
         modifiedAtProp.setPropertyName(ContentModel.PROP_MODIFIED_AT);
@@ -280,6 +280,9 @@ public class NodeService {
         }
 
         nodeManager.delete(id);
+
+        ScopeQuery scope = buildScopeQueryPermissionForNode(id);
+        permissionService.deletePermission(scope);
 
         try {
             nodeIndexerService.deleteNodeIndex(node.getId());
@@ -325,6 +328,54 @@ public class NodeService {
 
     private boolean hasName(Node node) {
         return !StringUtils.isBlank(NodeUtils.getProperty(node.getProperties(), ContentModel.PROP_NAME).orElse(new Property()).getStringVal());
+    }
+
+    private Permission buildDefaultPermissionForNode(long nodeId) {
+        Permission permission = Permission.builder()
+                .ownerType(OwnerType.USER.toString())
+                .ownerId(authenticationService.getUserId())
+                .resourceType(Node.class.getName())
+                .resourceId(String.valueOf(nodeId))
+                .read(true)
+                .create(true)
+                .update(true)
+                .delete(true)
+                .build();
+
+        return permission;
+    }
+
+    private ScopeQuery buildDefaultScopeQueryPermissionForNode(long nodeId) {
+        ScopeQuery scope = ScopeQuery.builder()
+                .ownerScope(
+                        OwnerScopeQuery.builder()
+                                .ownerUser(
+                                        new OwnerScopeQuery.OwnerUser(OwnerType.USER.toString())
+                                )
+                                .build()
+                )
+                .resourceScope(
+                        ResourceScopeQuery.builder()
+                                .resourceType(Node.class.getName())
+                                .resourceId(String.valueOf(nodeId))
+                                .build()
+                )
+                .build();
+
+        return scope;
+    }
+
+    private ScopeQuery buildScopeQueryPermissionForNode(long nodeId) {
+        ScopeQuery scope = ScopeQuery.builder()
+                .resourceScope(
+                        ResourceScopeQuery.builder()
+                                .resourceType(Node.class.getName())
+                                .resourceId(String.valueOf(nodeId))
+                                .build()
+                )
+                .build();
+
+        return scope;
     }
 
 }

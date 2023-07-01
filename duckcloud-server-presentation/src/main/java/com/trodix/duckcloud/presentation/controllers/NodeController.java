@@ -9,6 +9,9 @@ import com.trodix.duckcloud.presentation.dto.mappers.TreeNodeMapper;
 import com.trodix.duckcloud.presentation.dto.requests.NodeRequest;
 import com.trodix.duckcloud.presentation.dto.responses.NodeResponse;
 import com.trodix.duckcloud.presentation.dto.responses.TreeNodeResponse;
+import com.trodix.duckcloud.security.annotations.AuthResourceId;
+import com.trodix.duckcloud.security.annotations.Authorization;
+import com.trodix.duckcloud.security.models.PermissionType;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -53,6 +56,7 @@ public class NodeController {
     }
 
     @PostMapping("")
+    @Authorization(permissionType = PermissionType.CREATE, resourceType = Node.class)
     public void create(@RequestBody @Valid NodeRequest request) {
 
         final Node data = nodeMapper.toEntity(request);
@@ -60,7 +64,8 @@ public class NodeController {
     }
 
     @PutMapping("/{id}")
-    public void update(@PathVariable Long id, @RequestBody @Valid NodeRequest request) {
+    @Authorization(permissionType = PermissionType.UPDATE, resourceType = Node.class)
+    public void update(@PathVariable @AuthResourceId Long id, @RequestBody @Valid NodeRequest request) {
 
         final Node data = nodeMapper.toEntity(request);
         data.setId(id);
@@ -68,7 +73,8 @@ public class NodeController {
     }
 
     @DeleteMapping("/{id}")
-    public void delete(@PathVariable Long id) {
+    @Authorization(permissionType = PermissionType.DELETE, resourceType = Node.class)
+    public void delete(@PathVariable @AuthResourceId Long id) {
         nodeService.delete(id);
     }
 

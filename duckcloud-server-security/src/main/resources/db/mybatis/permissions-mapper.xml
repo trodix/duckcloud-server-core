@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.trodix.duckcloud.security.persistance.dao.mappers.PermissionMapper">
+
+    <resultMap id="result_Permission" type="Permission">
+        <result property="id" column="p_id" />
+        <result property="ownerType" column="p_owner_type" />
+        <result property="ownerId" column="p_owner_id" />
+        <result property="resourceType" column="p_resource_type" />
+        <result property="resourceId" column="p_resource_id" />
+        <result property="read" column="p_action_read" />
+        <result property="create" column="p_action_create" />
+        <result property="update" column="p_action_update" />
+        <result property="delete" column="p_action_delete" />
+    </resultMap>
+
+    <sql id="fields_Permission">
+        p.id as p_id, p.owner_type as p_owner_type, p.owner_id as p_owner_id,
+        p.resource_type as p_resource_type, p.resource_id as p_resource_id,
+        p.action_read as p_action_read,
+        p.action_create as p_action_create,
+        p.action_update as p_action_update,
+        p.action_delete as p_action_delete
+    </sql>
+
+    <sql id="select_Permission">
+        SELECT
+        <include refid="fields_Permission" />
+        FROM permissions p
+    </sql>
+
+    <select id="findPermissionsForResource" resultMap="result_Permission">
+        <include refid="select_Permission" />
+        WHERE
+            p.resource_type = #{resourceType}
+        AND
+            p.resource_id = #{resourceId}
+    </select>
+
+    <select id="findPermissionForOwnerAndResource" resultMap="result_Permission">
+        <include refid="select_Permission" />
+        WHERE
+        (
+            (
+                    p.owner_type = #{ownerScope.ownerUser.ownerType}
+                AND
+                    p.owner_id = #{ownerScope.ownerUser.userId}
+            )
+            OR
+            (
+                    p.owner_type = #{ownerScope.ownerAuthorities.ownerType}
+                AND
+                    p.owner_id IN
+                    <foreach collection="ownerScope.ownerAuthorities.grantedAuthorityList" item="roleId" index="index" open="(" separator="," close=")">
+                        #{roleId}
+                    </foreach>
+            )
+        )
+        AND
+            p.resource_type = #{resourceScope.resourceType}
+        AND (
+            p.resource_id = #{resourceScope.resourceId} OR p.resource_id IS NULL
+        )
+    </select>
+
+    <select id="findPermissionForOwnerAndResourceType" resultMap="result_Permission">
+        <include refid="select_Permission" />
+        WHERE
+        (
+            (
+                p.owner_type = #{ownerScope.ownerUser.ownerType}
+            AND
+                p.owner_id = #{ownerScope.ownerUser.userId}
+            )
+            OR
+            (
+                p.owner_type = #{ownerScope.ownerAuthorities.ownerType}
+            AND
+                p.owner_id IN
+                <foreach collection="ownerScope.ownerAuthorities.grantedAuthorityList" item="roleId" index="index" open="(" separator="," close=")">
+                    #{roleId}
+                </foreach>
+            )
+        )
+        AND
+            p.resource_type = #{resourceScope.resourceType}
+    </select>
+
+    <insert id="insertPermission" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
+        INSERT INTO permissions (
+            owner_type, owner_id, resource_type, resource_id, action_read, action_create, action_update, action_delete
+        )
+        VALUES (
+            #{ownerType}, #{ownerId}, #{resourceType}, #{resourceId},
+            #{read}, #{create}, #{update}, #{delete}
+        )
+        RETURNING id
+    </insert>
+
+    <update id="updatePermission">
+        UPDATE permissions SET
+            action_read = #{read}, action_create = #{create},
+            action_update = #{update}, action_delete = #{delete}
+        WHERE
+            owner_type = #{ownerType}
+        AND
+            owner_id = #{ownerId}
+        AND
+            resource_type = #{resourceType}
+        AND
+            resource_id = #{resourceId}
+    </update>
+
+    <delete id="deletePermission">
+        DELETE FROM permissions p
+        WHERE
+        <if test="ownerScope != null">
+            p.owner_type = #{ownerScope.ownerUser.ownerType}
+        AND
+        </if>
+        <if test="ownerScope != null">
+            p.owner_id = #{ownerScope.ownerUser.userId}
+        AND
+        </if>
+            p.resource_type = #{resourceScope.resourceType}
+        AND
+            p.resource_id = #{resourceScope.resourceId}
+    </delete>
+
+</mapper>

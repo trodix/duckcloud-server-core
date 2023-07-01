@@ -59,8 +59,9 @@
         <include refid="select_node" />
     </select>
 
-    <select id="findAllPageable" resultMap="result_Node">
+    <select id="findAllTypeContentPageable" resultMap="result_Node">
         <include refid="select_node" />
+        WHERE t.name = 'cm:content'
     </select>
 
     <select id="findTreeNodesByParentId" resultMap="result_TreeNode">
