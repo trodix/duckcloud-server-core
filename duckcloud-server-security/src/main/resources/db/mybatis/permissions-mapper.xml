@@ -60,9 +60,11 @@
         )
         AND
             p.resource_type = #{resourceScope.resourceType}
+        <if test="resourceScope.resourceId != null">
         AND (
-            p.resource_id = #{resourceScope.resourceId} OR p.resource_id IS NULL
+            p.resource_id = #{resourceScope.resourceId}
         )
+        </if>
     </select>
 
     <select id="findPermissionForOwnerAndResourceType" resultMap="result_Permission">

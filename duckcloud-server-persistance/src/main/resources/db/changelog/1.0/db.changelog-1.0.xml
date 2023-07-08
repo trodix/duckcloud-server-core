@@ -115,10 +115,18 @@
             <column name="property_name" value="cm:name" />
             <column name="string_val" value="-root-" />
         </insert>
-        <insert tableName="properties">
-            <column name="node_id" value="3" />
-            <column name="property_name" value="cm:name" />
-            <column name="string_val" value="Document1.docx" />
+    </changeSet>
+
+    <changeSet id="add-default-permissions" author="svallet">
+        <insert tableName="permissions">
+            <column name="owner_type" value="ROLE" />
+            <column name="owner_id" value="ROLE_ecm-admin" />
+            <column name="resource_type" value="com.trodix.duckcloud.persistance.entities.Node" />
+            <column name="resource_id" value="1" />
+            <column name="action_read" value="true" />
+            <column name="action_create" value="true" />
+            <column name="action_update" value="true" />
+            <column name="action_delete" value="true" />
         </insert>
     </changeSet>
 
