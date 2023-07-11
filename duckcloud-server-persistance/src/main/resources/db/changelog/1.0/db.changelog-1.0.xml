@@ -84,6 +84,38 @@
         <addUniqueConstraint tableName="properties" columnNames="node_id, property_name" constraintName="property_name_ix1" />
     </changeSet>
 
+<!--    <changeSet id="create-permissions-table" author="svallet">-->
+<!--        <createTable tableName="permissions">-->
+<!--            <column name="id" type="BIGINT" autoIncrement="true">-->
+<!--                <constraints primaryKey="true" />-->
+<!--            </column>-->
+<!--            <column name="owner_type" type="VARCHAR(25)">-->
+<!--                <constraints nullable="false" unique="false" />-->
+<!--            </column>-->
+<!--            <column name="owner_id" type="VARCHAR(36)">-->
+<!--                <constraints nullable="false" unique="false" />-->
+<!--            </column>-->
+<!--            <column name="resource_type" type="VARCHAR(255)">-->
+<!--                <constraints nullable="true" unique="false" />-->
+<!--            </column>-->
+<!--            <column name="resource_id" type="VARCHAR(36)">-->
+<!--                <constraints nullable="true" unique="false" />-->
+<!--            </column>-->
+<!--            <column name="action_read" type="BOOLEAN">-->
+<!--                <constraints nullable="false" unique="false" />-->
+<!--            </column>-->
+<!--            <column name="action_create" type="BOOLEAN">-->
+<!--                <constraints nullable="false" unique="false" />-->
+<!--            </column>-->
+<!--            <column name="action_update" type="BOOLEAN">-->
+<!--                <constraints nullable="false" unique="false" />-->
+<!--            </column>-->
+<!--            <column name="action_delete" type="BOOLEAN">-->
+<!--                <constraints nullable="false" unique="false" />-->
+<!--            </column>-->
+<!--        </createTable>-->
+<!--    </changeSet>-->
+
     <changeSet id="add-default-types" author="svallet">
         <loadData file="db/changelog/1.0/data/app_types_1.0.csv" separator=";" tableName="types">
             <column header="name" name="name" type="STRING"/>
@@ -117,17 +149,17 @@
         </insert>
     </changeSet>
 
-    <changeSet id="add-default-permissions" author="svallet">
-        <insert tableName="permissions">
-            <column name="owner_type" value="ROLE" />
-            <column name="owner_id" value="ROLE_ecm-admin" />
-            <column name="resource_type" value="com.trodix.duckcloud.persistance.entities.Node" />
-            <column name="resource_id" value="1" />
-            <column name="action_read" value="true" />
-            <column name="action_create" value="true" />
-            <column name="action_update" value="true" />
-            <column name="action_delete" value="true" />
-        </insert>
-    </changeSet>
+<!--    <changeSet id="add-default-permissions" author="svallet">-->
+<!--        <insert tableName="permissions">-->
+<!--            <column name="owner_type" value="ROLE" />-->
+<!--            <column name="owner_id" value="ROLE_ecm-admin" />-->
+<!--            <column name="resource_type" value="com.trodix.duckcloud.persistance.entities.Node" />-->
+<!--            <column name="resource_id" value="1" />-->
+<!--            <column name="action_read" value="true" />-->
+<!--            <column name="action_create" value="true" />-->
+<!--            <column name="action_update" value="true" />-->
+<!--            <column name="action_delete" value="true" />-->
+<!--        </insert>-->
+<!--    </changeSet>-->
 
 </databaseChangeLog>

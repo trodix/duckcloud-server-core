@@ -4,7 +4,7 @@
     <module name="duckcloud-server-core" />
     <extension name="coverage">
       <pattern>
-        <option name="PATTERN" value="com.trodix.duckcloud.core.*" />
+        <option name="PATTERN" value="com.trodix.security.*" />
         <option name="ENABLED" value="true" />
       </pattern>
     </extension>

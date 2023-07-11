@@ -56,7 +56,7 @@ public class NodeController {
     }
 
     @PostMapping("")
-    @Authorization(permissionType = PermissionType.CREATE, resourceType = Node.class)
+    @Authorization(resourceType = "feature:node", permissionType = PermissionType.WRITE)
     public void create(@RequestBody @Valid NodeRequest request) {
 
         final Node data = nodeMapper.toEntity(request);
@@ -64,7 +64,7 @@ public class NodeController {
     }
 
     @PutMapping("/{id}")
-    @Authorization(permissionType = PermissionType.UPDATE, resourceType = Node.class)
+    @Authorization(resourceType = "feature:node", permissionType = PermissionType.WRITE)
     public void update(@PathVariable @AuthResourceId Long id, @RequestBody @Valid NodeRequest request) {
 
         final Node data = nodeMapper.toEntity(request);
@@ -73,7 +73,7 @@ public class NodeController {
     }
 
     @DeleteMapping("/{id}")
-    @Authorization(permissionType = PermissionType.DELETE, resourceType = Node.class)
+    @Authorization(resourceType = "feature:node", permissionType = PermissionType.DELETE)
     public void delete(@PathVariable @AuthResourceId Long id) {
         nodeService.delete(id);
     }

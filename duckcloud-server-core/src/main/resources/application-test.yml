@@ -1,0 +1,40 @@
+#spring:
+#  datasource:
+#    driverClassName: org.testcontainers.jdbc.ContainerDatabaseDriver
+#
+#  ## Keycloak SSO Authentication Server
+#  security:
+#    oauth2:
+#      resourceserver:
+#        jwt:
+#          issuer-uri: http://localhost:8080/realms/market
+#      client:
+#        provider:
+#          market:
+#            token-uri: http://localhost:8080/realms/market/protocol/openid-connect/token
+#        registration:
+#          market:
+#            authorization-grant-type: client_credentials
+#            client-id: duckcloud-webservice
+#            client-secret: mqZqOOLh9pUEXNclDI7k9Lz1AymXptWE
+#
+#app:
+#  client:
+#    registration:
+#      name: market
+#      keycloak-admin-uri: http://localhost:8080/admin/realms/market
+#  auth:
+#    allowed-origins: http://localhost:4200
+#  storage:
+#    endpoint: http://127.0.0.1:9000
+#    accessKey: SykAM0TXTf3OVp5j
+#    secretKey: JI4xH7DoE3q4GWlpomjiq3l6lkTn2xVS
+#  onlyoffice:
+#    jwt:
+#      secret: WlEJf7hdzCEGwTWkO89i
+#  server:
+#    public-base-url: "http://trodix.local:8010"
+#
+#casbin:
+#  model: classpath:casbin/model.conf
+#  policy: classpath:casbin/policy-test.csv

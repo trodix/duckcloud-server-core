@@ -15,6 +15,7 @@ import io.minio.ObjectWriteResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.casbin.jcasbin.main.Enforcer;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -22,6 +23,8 @@ import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+
+import static com.trodix.duckcloud.security.services.AuthorizationUtils.DEFAULT_TENANT;
 
 @Service
 @RequiredArgsConstructor
@@ -39,6 +42,8 @@ public class NodeService {
     private final AuthenticationService authenticationService;
 
     private final PermissionService permissionService;
+
+    private final Enforcer casbinEnforcer;
 
     public Optional<Node> getOne(Long id) {
         return nodeManager.findOne(id);
@@ -140,6 +145,13 @@ public class NodeService {
 
         Permission permission = buildDefaultPermissionForNode(node.getId());
         permissionService.createPermission(permission);
+
+        // Mise à jour de la politique Casbin
+        String subject = authenticationService.getUserId();
+        String object = String.valueOf(node.getId());
+        String action = "manage"; // Exemple d'action à ajouter pour la nouvelle donnée
+
+        casbinEnforcer.addPolicy(subject, object, action);
 
         indexNode(node);
     }
@@ -283,6 +295,8 @@ public class NodeService {
 
         ScopeQuery scope = buildScopeQueryPermissionForNode(id);
         permissionService.deletePermission(scope);
+
+        casbinEnforcer.removeFilteredPolicy(1, String.valueOf(id));
 
         try {
             nodeIndexerService.deleteNodeIndex(node.getId());

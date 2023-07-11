@@ -68,10 +68,8 @@ public class PermissionService {
 
             if (PermissionType.READ == permissionType) {
                 return permission.isRead();
-            } else if (PermissionType.CREATE == permissionType) {
+            } else if (PermissionType.WRITE == permissionType) {
                 return permission.isCreate();
-            } else if (PermissionType.UPDATE == permissionType) {
-                return permission.isUpdate();
             } else if (PermissionType.DELETE == permissionType) {
                 return permission.isDelete();
             } else {

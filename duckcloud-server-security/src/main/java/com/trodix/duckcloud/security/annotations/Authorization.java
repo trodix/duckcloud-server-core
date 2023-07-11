@@ -11,7 +11,7 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Authorization {
 
-    Class resourceType();
+    String resourceType();
 
     PermissionType permissionType();
 

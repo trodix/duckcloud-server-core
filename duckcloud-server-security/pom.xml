@@ -41,6 +41,15 @@
             <artifactId>keycloak-core</artifactId>
             <version>21.1.1</version>
         </dependency>
+        <dependency>
+            <groupId>org.casbin</groupId>
+            <artifactId>casbin-spring-boot-starter</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.casbin</groupId>
+            <artifactId>jdbc-adapter</artifactId>
+        </dependency>
+
     </dependencies>
 
 </project>
