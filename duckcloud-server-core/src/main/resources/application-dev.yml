@@ -37,3 +37,7 @@ app:
       secret: WlEJf7hdzCEGwTWkO89i
   server:
     public-base-url: "http://trodix.local:8010"
+
+sentry:
+  dsn: "http://28cd491830984272b4d33684a9d53ce1@localhost:9010/2"
+  traces-sample-rate: 1.0

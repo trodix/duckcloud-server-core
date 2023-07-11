@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+		 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
 	<parent>
@@ -18,17 +18,17 @@
 
 	<packaging>pom</packaging>
 
-    <modules>
+	<modules>
 		<module>duckcloud-server-core</module>
-        <module>duckcloud-server-persistance</module>
+		<module>duckcloud-server-persistance</module>
 		<module>duckcloud-server-domain</module>
 		<module>duckcloud-server-presentation</module>
 		<module>duckcloud-server-security</module>
 		<module>duckcloud-server-connectors</module>
 		<module>duckcloud-server-connectors-onlyoffice</module>
-    </modules>
+	</modules>
 
-    <properties>
+	<properties>
 		<java.version>17</java.version>
 		<spring-doc.version>2.0.4</spring-doc.version>
 		<mapstruct.version>1.5.3.Final</mapstruct.version>
@@ -37,9 +37,17 @@
 		<minio-client.version>8.5.1</minio-client.version>
 		<tika-parsers.version>1.17</tika-parsers.version>
 		<keycloak.version>21.1.1</keycloak.version>
+		<sentry.version>6.23.0</sentry.version>
+
+		<SENTRY_AUTH_TOKEN>3e4148865315417d939a87d1fda936304659ed30bb564845918a6fa7edc1d664</SENTRY_AUTH_TOKEN>
 	</properties>
 
 	<dependencies>
+		<dependency>
+			<groupId>io.sentry</groupId>
+			<artifactId>sentry-spring-boot-starter-jakarta</artifactId>
+			<version>${sentry.version}</version>
+		</dependency>
 		<dependency>
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
@@ -229,6 +237,41 @@
 					<execution>
 						<goals>
 							<goal>check</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+
+			<plugin>
+				<groupId>io.sentry</groupId>
+				<artifactId>sentry-maven-plugin</artifactId>
+				<version>0.0.2</version>
+				<inherited>false</inherited>
+				<configuration>
+					<!-- for showing output of sentry-cli -->
+					<debugSentryCli>true</debugSentryCli>
+
+					<!-- download the latest sentry-cli and provide path to it here -->
+					<!-- download it here: https://github.com/getsentry/sentry-cli/releases -->
+					<!-- minimum required version is 2.17.3 -->
+					<sentryCliExecutablePath>${project.basedir}/sentry-cli</sentryCliExecutablePath>
+
+					<org>trodix</org>
+
+					<project>duckcloud-server</project>
+
+					<!-- in case you're self hosting, provide the URL here -->
+					<url>http://localhost:9010/</url>
+
+					<!-- provide your auth token via SENTRY_AUTH_TOKEN environment variable -->
+					<!-- you can find it in Sentry UI: Settings > Account > API > Auth Tokens -->
+					<authToken>${SENTRY_AUTH_TOKEN}</authToken>
+				</configuration>
+				<executions>
+					<execution>
+						<phase>install</phase>
+						<goals>
+							<goal>uploadSourceBundle</goal>
 						</goals>
 					</execution>
 				</executions>
