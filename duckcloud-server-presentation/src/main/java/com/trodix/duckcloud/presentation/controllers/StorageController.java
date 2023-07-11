@@ -8,6 +8,8 @@ import com.trodix.duckcloud.persistance.entities.Node;
 import com.trodix.duckcloud.persistance.utils.NodeUtils;
 import com.trodix.duckcloud.presentation.dto.mappers.NodeMapper;
 import com.trodix.duckcloud.presentation.dto.requests.NodeWithContentRequest;
+import com.trodix.duckcloud.security.annotations.Authorization;
+import com.trodix.duckcloud.security.models.PermissionType;
 import io.minio.messages.Bucket;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.annotation.security.RolesAllowed;
@@ -50,6 +52,7 @@ public class StorageController {
 
     @Operation(summary = "Create a new node and attach a file")
     @PostMapping(path = "/nodes", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
+    @Authorization(resourceType = "feature:node", permissionType = PermissionType.WRITE)
     public void create(@Valid NodeWithContentRequest request, @RequestPart(value = "file") final MultipartFile file) throws IOException {
 
         final Node node = nodeMapper.toEntity(request);
@@ -60,6 +63,7 @@ public class StorageController {
 
     @Operation(summary = "Update a file attached to a node")
     @PutMapping(path = "/nodes/{nodeId}/content", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
+    @Authorization(resourceType = "feature:node", permissionType = PermissionType.WRITE)
     public void create(@PathVariable final Long nodeId, @RequestPart(value = "file") final MultipartFile file) throws IOException {
 
         final Node node = nodeService.getOne(nodeId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Node not found for id " + nodeId));
@@ -70,6 +74,7 @@ public class StorageController {
 
     @Operation(summary = "Get the content of the latest version of the file attached to the node")
     @GetMapping("/nodes/{nodeId}/content")
+    @Authorization(resourceType = "feature:node", permissionType = PermissionType.READ)
     public ResponseEntity<ByteArrayResource> getNodeContentById(@PathVariable final Long nodeId) {
 
         Node node = nodeService.getOne(nodeId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Node not found for id " + nodeId));

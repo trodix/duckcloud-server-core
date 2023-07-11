@@ -1,8 +1,7 @@
 package com.trodix.duckcloud.security.annotations;
 
-import com.trodix.duckcloud.security.persistance.entities.*;
+import com.trodix.duckcloud.security.models.PermissionType;
 import com.trodix.duckcloud.security.services.AuthenticationService;
-import com.trodix.duckcloud.security.services.PermissionService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
@@ -10,11 +9,15 @@ import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
 import org.aspectj.lang.reflect.MethodSignature;
-import org.springframework.security.core.context.SecurityContextHolder;
+import org.casbin.jcasbin.main.Enforcer;
 import org.springframework.stereotype.Component;
 
 import java.lang.reflect.Field;
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 
 @Component
 @RequiredArgsConstructor
@@ -24,7 +27,7 @@ public class FilterAuthorizedAspect {
 
     private final AuthenticationService authenticationService;
 
-    private final PermissionService permissionService;
+    private final Enforcer enforcer;
 
     @Pointcut("@annotation(FilterAuthorized)")
     public void filterAuthorizedPointcut() {
@@ -57,46 +60,34 @@ public class FilterAuthorizedAspect {
         }
 
         MethodSignature methodSignature = ((MethodSignature) joinPoint.getSignature());
+        FilterAuthorized authz = methodSignature.getMethod().getAnnotation(FilterAuthorized.class);
 
-        Class resourceType = returnObjects.get(0).getClass();
+        String resourceType = authz.resourceType();
+        PermissionType permissionType = authz.permissionType();
+
         Class returnType = methodSignature.getReturnType();
         Class supported = List.class;
         if (!returnType.equals(supported)) {
             throw new IllegalAccessException("Return type must be of type " + List.class.getName() + ", found " + returnType.getName());
         }
 
-        ScopeQuery scope = ScopeQuery.builder()
-                .ownerScope(
-                        OwnerScopeQuery.builder()
-                                .ownerUser(
-                                        new OwnerScopeQuery.OwnerUser(authenticationService.getUserId())
-                                )
-                                .ownerAuthorities(
-                                        new OwnerScopeQuery.OwnerAuthorities(SecurityContextHolder.getContext().getAuthentication().getAuthorities().stream().map(a -> a.getAuthority()).toList())
-                                )
-                                .build()
-                )
-                .resourceScope(
-                        ResourceScopeQuery.builder()
-                                .resourceType(resourceType.getName())
-                                .build()
-                )
-                .build();
-
-        List<Permission> permissions = permissionService.getPermissionForOwnerAndResourceType(scope);
-
         Set<Object> filtered = new HashSet<>();
 
-        for (Permission p : permissions) {
-            for (Object o : returnObjects) {
-                String resourceId = findResourceIdFromAnnotatedField(o)
-                        .orElseThrow(() -> new IllegalArgumentException("No field annotated with " + FilterResourceId.class + " found for class " + o.getClass()));
-                if (p.getResourceType().equals(o.getClass().getName()) && (p.getResourceId() == null || p.getResourceId().equals(resourceId))) {
-                    log.debug("Authorization granted for permission {} on resource {}", p, resourceId);
-                    filtered.add(o);
-                } else {
-                    log.debug("Authorization denied for permission {} on resource {}", p, resourceId);
-                }
+        for (Object o : returnObjects) {
+            String resourceId = findResourceIdFromAnnotatedField(o)
+                    .orElseThrow(() -> new IllegalArgumentException(
+                            "No field annotated with " + FilterResourceId.class + " found for class " + o.getClass()));
+
+            String userId = authenticationService.getUserId();
+            String scope = String.format("%s:%s", resourceType, resourceId);
+
+            boolean isGranted = enforcer.enforce(userId, resourceType, permissionType.toString()) || enforcer.enforce(userId, scope, permissionType.toString());
+
+            if (isGranted) {
+                log.debug("Authorization granted for permission {} on resource {}", permissionType.toString(), scope);
+                filtered.add(o);
+            } else {
+                log.debug("Authorization denied for permission {} on resource {}", permissionType.toString(), scope);
             }
         }
 

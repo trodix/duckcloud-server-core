@@ -24,7 +24,7 @@ public interface NodeMapper {
 
     List<Node> findAllByNodeId(@Param("ids") List<Long> ids);
 
-    @FilterAuthorized(permissionType = PermissionType.READ)
+    @FilterAuthorized(resourceType = "feature:node", permissionType = PermissionType.READ)
     List<Node> findAllByParentId(Long parentId);
 
     List<Node> findAllTypeContentPageable(RowBounds rowbounds);

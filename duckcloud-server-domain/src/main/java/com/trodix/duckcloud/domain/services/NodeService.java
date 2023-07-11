@@ -8,13 +8,13 @@ import com.trodix.duckcloud.domain.utils.StorageUtils;
 import com.trodix.duckcloud.persistance.dao.NodeManager;
 import com.trodix.duckcloud.persistance.entities.*;
 import com.trodix.duckcloud.persistance.utils.NodeUtils;
-import com.trodix.duckcloud.security.persistance.entities.*;
+import com.trodix.duckcloud.security.models.PermissionType;
 import com.trodix.duckcloud.security.services.AuthenticationService;
-import com.trodix.duckcloud.security.services.PermissionService;
 import io.minio.ObjectWriteResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.casbin.jcasbin.main.Enforcer;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -38,7 +38,7 @@ public class NodeService {
 
     private final AuthenticationService authenticationService;
 
-    private final PermissionService permissionService;
+    private final Enforcer casbinEnforcer;
 
     public Optional<Node> getOne(Long id) {
         return nodeManager.findOne(id);
@@ -137,9 +137,6 @@ public class NodeService {
         }
         setCreatedAuthorProperties(node);
         nodeManager.create(node);
-
-        Permission permission = buildDefaultPermissionForNode(node.getId());
-        permissionService.createPermission(permission);
 
         indexNode(node);
     }
@@ -281,8 +278,11 @@ public class NodeService {
 
         nodeManager.delete(id);
 
-        ScopeQuery scope = buildScopeQueryPermissionForNode(id);
-        permissionService.deletePermission(scope);
+        casbinEnforcer.removeFilteredPolicy(1, String.format("feature:node:%s", id));
+
+        casbinEnforcer.removeFilteredGroupingPolicy(1, String.format("role:node:%s:%s", id, PermissionType.READ));
+        casbinEnforcer.removeFilteredGroupingPolicy(1, String.format("role:node:%s:%s", id, PermissionType.WRITE));
+        casbinEnforcer.removeFilteredGroupingPolicy(1, String.format("role:node:%s:%s", id, PermissionType.DELETE));
 
         try {
             nodeIndexerService.deleteNodeIndex(node.getId());
@@ -328,54 +328,6 @@ public class NodeService {
 
     private boolean hasName(Node node) {
         return !StringUtils.isBlank(NodeUtils.getProperty(node.getProperties(), ContentModel.PROP_NAME).orElse(new Property()).getStringVal());
-    }
-
-    private Permission buildDefaultPermissionForNode(long nodeId) {
-        Permission permission = Permission.builder()
-                .ownerType(OwnerType.USER.toString())
-                .ownerId(authenticationService.getUserId())
-                .resourceType(Node.class.getName())
-                .resourceId(String.valueOf(nodeId))
-                .read(true)
-                .create(true)
-                .update(true)
-                .delete(true)
-                .build();
-
-        return permission;
-    }
-
-    private ScopeQuery buildDefaultScopeQueryPermissionForNode(long nodeId) {
-        ScopeQuery scope = ScopeQuery.builder()
-                .ownerScope(
-                        OwnerScopeQuery.builder()
-                                .ownerUser(
-                                        new OwnerScopeQuery.OwnerUser(OwnerType.USER.toString())
-                                )
-                                .build()
-                )
-                .resourceScope(
-                        ResourceScopeQuery.builder()
-                                .resourceType(Node.class.getName())
-                                .resourceId(String.valueOf(nodeId))
-                                .build()
-                )
-                .build();
-
-        return scope;
-    }
-
-    private ScopeQuery buildScopeQueryPermissionForNode(long nodeId) {
-        ScopeQuery scope = ScopeQuery.builder()
-                .resourceScope(
-                        ResourceScopeQuery.builder()
-                                .resourceType(Node.class.getName())
-                                .resourceId(String.valueOf(nodeId))
-                                .build()
-                )
-                .build();
-
-        return scope;
     }
 
 }
