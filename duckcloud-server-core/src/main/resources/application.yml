@@ -39,3 +39,7 @@ app:
       secret: ""
   server:
     public-base-url: "http://trodix.local:8010"
+
+casbin:
+  model: classpath:casbin/model.conf
+  policy: classpath:casbin/policy.csv

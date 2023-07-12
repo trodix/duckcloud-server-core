@@ -1,27 +1,23 @@
 package com.trodix.duckcloud.security.annotations;
 
 import com.trodix.duckcloud.security.models.PermissionType;
-import com.trodix.duckcloud.security.persistance.entities.OwnerScopeQuery;
-import com.trodix.duckcloud.security.persistance.entities.ResourceScopeQuery;
-import com.trodix.duckcloud.security.persistance.entities.ScopeQuery;
 import com.trodix.duckcloud.security.services.AuthenticationService;
-import com.trodix.duckcloud.security.services.PermissionService;
 import lombok.RequiredArgsConstructor;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
 import org.aspectj.lang.reflect.MethodSignature;
+import org.casbin.jcasbin.main.Enforcer;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
 
 @Component
 @RequiredArgsConstructor
@@ -30,7 +26,7 @@ public class AuthorizationAspect {
 
     private final AuthenticationService authenticationService;
 
-    private final PermissionService permissionService;
+    private final Enforcer enforcer;
 
     @Pointcut("@annotation(Authorization)")
     public void authorizationPointcut() {
@@ -48,8 +44,8 @@ public class AuthorizationAspect {
         boolean granted;
 
         if (annotatedParameterValue.isEmpty()) {
-            // case: create, we don't need permission on a resourceId
-            if (!authz.permissionType().equals(PermissionType.CREATE)) {
+            // case: write, we don't need permission on a resourceId
+            if (!authz.permissionType().equals(PermissionType.WRITE)) {
                 throw new IllegalArgumentException("You need to annotate a method parameter with @ResourceId");
             }
             granted = handleAuthorizationForUser(authz);
@@ -68,53 +64,19 @@ public class AuthorizationAspect {
 
     private boolean handleAuthorizationForUser(Authorization authz) {
         String userId = authenticationService.getUserId();
+        String resourceType = authz.resourceType().toLowerCase();
+        String permissionType = authz.permissionType().toString().toUpperCase();
 
-        List<GrantedAuthority> grantedAuthorityList = (List<GrantedAuthority>) SecurityContextHolder.getContext().getAuthentication().getAuthorities();
-        List<String> roles = grantedAuthorityList.stream().map(p -> p.getAuthority()).toList();
-
-        ScopeQuery scope = ScopeQuery.builder()
-                .ownerScope(
-                        OwnerScopeQuery.builder()
-                                .ownerUser(new OwnerScopeQuery.OwnerUser(userId))
-                                .ownerAuthorities(new OwnerScopeQuery.OwnerAuthorities(roles))
-                                .build()
-                )
-                .resourceScope(
-                        ResourceScopeQuery.builder()
-                                .resourceType(authz.resourceType().getName())
-                                .build()
-                )
-                .build();
-
-        PermissionType permissionType = authz.permissionType();
-
-        return permissionService.hasPermission(scope, permissionType);
+        return enforcer.enforce(userId, resourceType, permissionType);
     }
 
     private boolean handleAuthorizationForResource(Authorization authz, String resourceId) {
         String userId = authenticationService.getUserId();
+        String resourceType = authz.resourceType().toLowerCase();
+        String permissionType = authz.permissionType().toString().toUpperCase();
+        String scope = String.format("%s:%s", resourceType, resourceId);
 
-        List<GrantedAuthority> grantedAuthorityList = (List<GrantedAuthority>) SecurityContextHolder.getContext().getAuthentication().getAuthorities();
-        List<String> roles = grantedAuthorityList.stream().map(p -> p.getAuthority()).toList();
-
-        ScopeQuery scope = ScopeQuery.builder()
-                .ownerScope(
-                        OwnerScopeQuery.builder()
-                                .ownerUser(new OwnerScopeQuery.OwnerUser(userId))
-                                .ownerAuthorities(new OwnerScopeQuery.OwnerAuthorities(roles))
-                                .build()
-                )
-                .resourceScope(
-                        ResourceScopeQuery.builder()
-                                .resourceType(authz.resourceType().getName())
-                                .resourceId(resourceId)
-                                .build()
-                )
-                .build();
-
-        PermissionType permissionType = authz.permissionType();
-
-        return permissionService.hasPermission(scope, permissionType);
+        return enforcer.enforce(userId, resourceType, permissionType) || enforcer.enforce(userId, scope, permissionType);
     }
 
     private Map<String, Object> getAuthResourceIdAnnotatedParameterValue(Method method, Object[] args) {
