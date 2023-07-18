@@ -37,6 +37,20 @@ class CasbinPolicyTest extends PostgreSQLTestContainer {
     }
 
     @Test
+    public void checkRoleNodePermissions() {
+        assertTrue(casbinEnforcer.enforce("role:node:read", "feature:node", "READ"));
+        assertTrue(casbinEnforcer.enforce("role:node:write", "feature:node", "WRITE"));
+        assertTrue(casbinEnforcer.enforce("role:node:delete", "feature:node", "DELETE"));
+    }
+
+    @Test
+    public void checkRoleNodePermissionsOnResource() {
+        assertTrue(casbinEnforcer.enforce("role:node:read", "feature:node:27", "READ"));
+        assertTrue(casbinEnforcer.enforce("role:node:write", "feature:node:27", "WRITE"));
+        assertTrue(casbinEnforcer.enforce("role:node:delete", "feature:node:27", "DELETE"));
+    }
+
+    @Test
     public void checkUser2HasPermissionAdmin() {
         assertTrue(casbinEnforcer.enforce("1adf1de8-4ffe-4290-9cc5-17698593b280", "feature:node", "READ"));
         assertTrue(casbinEnforcer.enforce("1adf1de8-4ffe-4290-9cc5-17698593b280", "feature:node", "WRITE"));
@@ -62,6 +76,34 @@ class CasbinPolicyTest extends PostgreSQLTestContainer {
         assertTrue(casbinEnforcer.enforce("michel", "feature:node:27", "READ"));
         assertTrue(casbinEnforcer.enforce("michel", "feature:node:27", "WRITE"));
         assertTrue(casbinEnforcer.enforce("michel", "feature:node:27", "DELETE"));
+    }
+
+    @Test
+    public void checkJaneCanManageNode27() {
+        assertTrue(casbinEnforcer.enforce("jane", "feature:node:27", "READ"));
+        assertTrue(casbinEnforcer.enforce("jane", "feature:node:27", "WRITE"));
+        assertTrue(casbinEnforcer.enforce("jane", "feature:node:27", "DELETE"));
+    }
+
+    @Test
+    public void checkJaneCanManageNodes() {
+        assertFalse(casbinEnforcer.enforce("jane", "feature:node", "READ"));
+        assertFalse(casbinEnforcer.enforce("jane", "feature:node", "WRITE"));
+        assertFalse(casbinEnforcer.enforce("jane", "feature:node", "DELETE"));
+    }
+
+    @Test
+    public void checkJohnCanManageNodes() {
+        assertTrue(casbinEnforcer.enforce("john", "feature:node", "READ"));
+        assertTrue(casbinEnforcer.enforce("john", "feature:node", "WRITE"));
+        assertTrue(casbinEnforcer.enforce("john", "feature:node", "DELETE"));
+    }
+
+    @Test
+    public void checkJohnCanManageNode27() {
+        assertTrue(casbinEnforcer.enforce("john", "feature:node:27", "READ"));
+        assertTrue(casbinEnforcer.enforce("john", "feature:node:27", "WRITE"));
+        assertTrue(casbinEnforcer.enforce("john", "feature:node:27", "DELETE"));
     }
 
     @Test

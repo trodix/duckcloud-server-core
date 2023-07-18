@@ -79,15 +79,14 @@ public class FilterAuthorizedAspect {
                             "No field annotated with " + FilterResourceId.class + " found for class " + o.getClass()));
 
             String userId = authenticationService.getUserId();
-            String scope = String.format("%s:%s", resourceType, resourceId);
 
-            boolean isGranted = enforcer.enforce(userId, resourceType, permissionType.toString()) || enforcer.enforce(userId, scope, permissionType.toString());
+            boolean isGranted = enforcer.enforce(userId, resourceType, permissionType.toString());
 
             if (isGranted) {
-                log.debug("Authorization granted for permission {} on resource {}", permissionType.toString(), scope);
+                log.debug("Authorization granted for permission {} on resource {}", permissionType, resourceType);
                 filtered.add(o);
             } else {
-                log.debug("Authorization denied for permission {} on resource {}", permissionType.toString(), scope);
+                log.debug("Authorization denied for permission {} on resource {}", permissionType, resourceType);
             }
         }
 
