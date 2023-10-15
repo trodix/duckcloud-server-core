@@ -1,9 +1,9 @@
 package com.trodix.duckcloud.presentation.controllers;
 
+import com.trodix.casbinserver.client.api.v1.EnforcerApi;
 import com.trodix.duckcloud.security.services.AuthenticationService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.casbin.jcasbin.main.Enforcer;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -18,7 +18,7 @@ public class AuthorizationController {
 
     private final AuthenticationService authenticationService;
 
-    private final Enforcer enforcer;
+    private final EnforcerApi enforcer;
 
     @GetMapping("/roles")
     public List<String> getRoles() {

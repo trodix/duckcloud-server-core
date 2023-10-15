@@ -7,7 +7,7 @@ import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
 @Testcontainers
-public class PostgreSQLTestContainer extends TestProperties {
+public class PostgreSQLTestContainer {
 
     @DynamicPropertySource
     private static void setupProperties(DynamicPropertyRegistry registry) {

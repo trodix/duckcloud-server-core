@@ -1,5 +1,6 @@
 package com.trodix.duckcloud.security.annotations;
 
+import com.trodix.casbinserver.client.api.v1.EnforcerApi;
 import com.trodix.duckcloud.security.services.AuthenticationService;
 import lombok.RequiredArgsConstructor;
 import org.aspectj.lang.ProceedingJoinPoint;
@@ -7,7 +8,6 @@ import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
 import org.aspectj.lang.reflect.MethodSignature;
-import org.casbin.jcasbin.main.Enforcer;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.ResponseStatusException;
@@ -16,6 +16,7 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Component
@@ -25,7 +26,7 @@ public class AuthorizationAspect {
 
     private final AuthenticationService authenticationService;
 
-    private final Enforcer enforcer;
+    private final EnforcerApi enforcer;
 
     @Pointcut("@annotation(Authorization)")
     public void authorizationPointcut() {

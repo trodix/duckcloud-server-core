@@ -42,14 +42,10 @@
             <version>21.1.1</version>
         </dependency>
         <dependency>
-            <groupId>org.casbin</groupId>
-            <artifactId>casbin-spring-boot-starter</artifactId>
+            <groupId>com.trodix</groupId>
+            <artifactId>casbin-rest-java-client</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
         </dependency>
-        <dependency>
-            <groupId>org.casbin</groupId>
-            <artifactId>jdbc-adapter</artifactId>
-        </dependency>
-
     </dependencies>
 
 </project>

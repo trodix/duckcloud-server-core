@@ -1,5 +1,6 @@
 package com.trodix.duckcloud.domain.services;
 
+import com.trodix.casbinserver.client.api.v1.EnforcerApi;
 import com.trodix.duckcloud.domain.models.*;
 import com.trodix.duckcloud.domain.search.models.NodeIndex;
 import com.trodix.duckcloud.domain.search.services.NodeIndexerService;
@@ -14,7 +15,6 @@ import io.minio.ObjectWriteResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.casbin.jcasbin.main.Enforcer;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -38,7 +38,7 @@ public class NodeService {
 
     private final AuthenticationService authenticationService;
 
-    private final Enforcer casbinEnforcer;
+    private final EnforcerApi enforcer;
 
     public Optional<Node> getOne(Long id) {
         return nodeManager.findOne(id);
@@ -278,11 +278,11 @@ public class NodeService {
 
         nodeManager.delete(id);
 
-        casbinEnforcer.removeFilteredPolicy(1, String.format("feature:node:%s", id));
+        enforcer.removeFilteredPolicy(1, String.format("feature:node:%s", id));
 
-        casbinEnforcer.removeFilteredGroupingPolicy(1, String.format("role:node:%s:%s", id, PermissionType.READ));
-        casbinEnforcer.removeFilteredGroupingPolicy(1, String.format("role:node:%s:%s", id, PermissionType.WRITE));
-        casbinEnforcer.removeFilteredGroupingPolicy(1, String.format("role:node:%s:%s", id, PermissionType.DELETE));
+        enforcer.removeFilteredGroupingPolicy(1, String.format("role:node:%s:%s", id, PermissionType.READ));
+        enforcer.removeFilteredGroupingPolicy(1, String.format("role:node:%s:%s", id, PermissionType.WRITE));
+        enforcer.removeFilteredGroupingPolicy(1, String.format("role:node:%s:%s", id, PermissionType.DELETE));
 
         try {
             nodeIndexerService.deleteNodeIndex(node.getId());

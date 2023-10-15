@@ -1,5 +1,6 @@
 package com.trodix.duckcloud.security.annotations;
 
+import com.trodix.casbinserver.client.api.v1.EnforcerApi;
 import com.trodix.duckcloud.security.models.PermissionType;
 import com.trodix.duckcloud.security.services.AuthenticationService;
 import lombok.RequiredArgsConstructor;
@@ -9,7 +10,6 @@ import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
 import org.aspectj.lang.reflect.MethodSignature;
-import org.casbin.jcasbin.main.Enforcer;
 import org.springframework.stereotype.Component;
 
 import java.lang.reflect.Field;
@@ -27,7 +27,7 @@ public class FilterAuthorizedAspect {
 
     private final AuthenticationService authenticationService;
 
-    private final Enforcer enforcer;
+    private final EnforcerApi enforcer;
 
     @Pointcut("@annotation(FilterAuthorized)")
     public void filterAuthorizedPointcut() {

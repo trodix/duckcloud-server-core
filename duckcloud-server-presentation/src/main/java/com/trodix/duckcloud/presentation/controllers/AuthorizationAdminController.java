@@ -1,10 +1,10 @@
 package com.trodix.duckcloud.presentation.controllers;
 
+import com.trodix.casbinserver.client.api.v1.EnforcerApi;
 import com.trodix.duckcloud.presentation.dto.requests.PermissionRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.casbin.jcasbin.main.Enforcer;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -19,7 +19,7 @@ import java.util.List;
 @Slf4j
 public class AuthorizationAdminController {
 
-    private final Enforcer enforcer;
+    private final EnforcerApi enforcer;
 
     @GetMapping("/subjects")
     public List<String> getSubjects() {

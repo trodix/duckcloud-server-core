@@ -1,62 +1,28 @@
 package com.trodix.duckcloud.security;
 
-import com.trodix.duckcloud.security.utils.CasbinFilePolicyLoader;
-import com.trodix.duckcloud.security.utils.ConfigResourceLoader;
+import com.trodix.casbinserver.client.api.v1.EnforcerApi;
+import com.trodix.casbinserver.client.EnforcerClient;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.casbin.adapter.JDBCAdapter;
-import org.casbin.jcasbin.main.Enforcer;
-import org.casbin.jcasbin.model.Model;
-import org.casbin.jcasbin.persist.Adapter;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-
-import javax.sql.DataSource;
-import java.io.IOException;
 
 @Configuration
 @RequiredArgsConstructor
 @Slf4j
 public class CasbinConfig {
 
-    private final DataSource dataSource;
-
-    private final ConfigResourceLoader configResourceLoader;
-
-    @Value("${casbin.model}")
-    private String casbinModel;
-
-    @Value("${casbin.policy}")
-    private String casbinPolicy;
-
     @Bean
-    public Adapter casbinDatabaseAdapter() throws Exception {
-        return new JDBCAdapter(dataSource);
-    }
+    public EnforcerApi enforcerApi() {
 
-    @Bean
-    public Enforcer casbinEnforcer() throws Exception {
+        String token = "eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICJGTDhTS2pZcU85NWFqQ3NmS3I4ZndhaFoxanM0dVRjbkZYbk5MMmZtOGNnIn0.eyJleHAiOjE2OTczODI5MTQsImlhdCI6MTY5NzM4MjYxNCwianRpIjoiNzkwZjJkMDYtMTgyMi00YjBmLWI0Y2ItYjNmZDU1ZDYxZjVkIiwiaXNzIjoiaHR0cDovL2xvY2FsaG9zdDo4MDgwL3JlYWxtcy9tYXJrZXQiLCJhdWQiOlsicmVhbG0tbWFuYWdlbWVudCIsInF1YWNrLWR1Y2stZWNtLXVpIiwibWFya2V0LWJhY2tlbmQiLCJxdWFjay1kdWNrLWVjbS1hcGkiLCJhY2NvdW50Il0sInN1YiI6IjM5ZjYwMGFiLTFhNjktNGU0Ny05NjhiLTMwMjNkMWQ3MTYwMCIsInR5cCI6IkJlYXJlciIsImF6cCI6ImR1Y2tjbG91ZC13ZWJzZXJ2aWNlIiwiYWNyIjoiMSIsInJlYWxtX2FjY2VzcyI6eyJyb2xlcyI6WyJkZWZhdWx0LXJvbGVzLW1hcmtldCIsIm9mZmxpbmVfYWNjZXNzIiwidW1hX2F1dGhvcml6YXRpb24iLCJhcHAtdXNlciJdfSwicmVzb3VyY2VfYWNjZXNzIjp7InJlYWxtLW1hbmFnZW1lbnQiOnsicm9sZXMiOlsidmlldy11c2VycyIsIm1hbmFnZS1jbGllbnRzIiwicXVlcnktZ3JvdXBzIiwicXVlcnktdXNlcnMiXX0sInF1YWNrLWR1Y2stZWNtLXVpIjp7InJvbGVzIjpbImVjbS11aS11c2VyIl19LCJtYXJrZXQtYmFja2VuZCI6eyJyb2xlcyI6WyJtYXJrZXQtY3VzdG9tZXIiXX0sInF1YWNrLWR1Y2stZWNtLWFwaSI6eyJyb2xlcyI6WyJlY20tdXNlciJdfSwiYWNjb3VudCI6eyJyb2xlcyI6WyJtYW5hZ2UtYWNjb3VudCIsIm1hbmFnZS1hY2NvdW50LWxpbmtzIiwidmlldy1wcm9maWxlIl19fSwic2NvcGUiOiJwcm9maWxlIGVtYWlsIiwiY2xpZW50SWQiOiJkdWNrY2xvdWQtd2Vic2VydmljZSIsImNsaWVudEhvc3QiOiIxNzIuMjYuMC4xIiwiZW1haWxfdmVyaWZpZWQiOmZhbHNlLCJwcmVmZXJyZWRfdXNlcm5hbWUiOiJzZXJ2aWNlLWFjY291bnQtZHVja2Nsb3VkLXdlYnNlcnZpY2UiLCJjbGllbnRBZGRyZXNzIjoiMTcyLjI2LjAuMSJ9.k7QJHrezgvAVHj0TrYlnhVxyEILr0xsp5FFI1LvKX4-4oE-lqQsbnQxwTpWq3Jiz636TJg4lObpOSHhFoZibed7ZjPLXLDcmM87_7fg2IQRf9isgwWCXXEJeAWzCgARa6N-P_KPViuRNi4A9AtWtNaoQk3FP9hGlBNmQyaqMZQX6Zknuqom-9u-3_cl3ip2djOvD0aIdDq27kRmPoBdyoTKI3RS2X2ui5sF8uFilr4fABRCeNWX5c7X3CTpI_bfUstOPThHEF629GNWc-GCOxFp2sATTzDo3uhkh2csuctBj9tTh3236SSlI3vihwDhJUamVruIFPCVXE_mNwPUAtQ";
 
-        String casbinModelConfig = configResourceLoader.readConfig(casbinModel);
+        EnforcerClient client = new EnforcerClient().newBuilder()
+                .header("Authorization", "Bearer " + token)
+                .baseUrl("http://localhost:7015")
+                .build();
 
-        Model model = new Model();
-        model.loadModelFromText(casbinModelConfig);
-
-        Enforcer enforcer = new Enforcer(model, casbinDatabaseAdapter());
-        initDefaultPolicies(enforcer);
-
-        return enforcer;
-    }
-
-    private void initDefaultPolicies(Enforcer enforcer) throws IOException {
-
-        String casbinPolicyConfig = configResourceLoader.readConfig(casbinPolicy);
-        CasbinFilePolicyLoader loader = new CasbinFilePolicyLoader();
-
-        CasbinFilePolicyLoader.ConfigRules configRules = loader.parseRules(casbinPolicyConfig);
-        loader.persistLocalPolicy(configRules, enforcer);
-
+        return new EnforcerApi(client);
     }
 
 }

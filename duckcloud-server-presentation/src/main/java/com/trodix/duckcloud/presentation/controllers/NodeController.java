@@ -1,5 +1,6 @@
 package com.trodix.duckcloud.presentation.controllers;
 
+import com.trodix.casbinserver.client.api.v1.EnforcerApi;
 import com.trodix.duckcloud.domain.services.NodeService;
 import com.trodix.duckcloud.persistance.entities.Node;
 import com.trodix.duckcloud.presentation.dto.mappers.NodeMapper;
@@ -18,7 +19,6 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.SetUtils;
-import org.casbin.jcasbin.main.Enforcer;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -48,7 +48,7 @@ public class NodeController {
 
     private final TreeNodeMapper treeNodeMapper;
 
-    private final Enforcer enforcer;
+    private final EnforcerApi enforcer;
 
     private final AuthenticationService authenticationService;
 
