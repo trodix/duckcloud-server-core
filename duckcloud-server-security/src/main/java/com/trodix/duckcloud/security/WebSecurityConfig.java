@@ -50,17 +50,27 @@ public class WebSecurityConfig {
         http.oauth2Client();
 
         // OAUTH authentication
-        http.authorizeHttpRequests()
+        http
+                .httpBasic()
+                .and()
+                .authorizeHttpRequests()
+                .requestMatchers("/actuator/**")
+                .permitAll()
+                .and()
+                .authorizeHttpRequests()
+                .requestMatchers("/swagger-ui/**", "/v3/api-docs/**")
+                .permitAll()
+                .and()
+                .authorizeHttpRequests()
                 .and()
                 .oauth2ResourceServer(
                         config -> config
                                 .jwt()
                                 .jwtAuthenticationConverter(keycloakJwtAuthenticationConverter))
                 .authorizeHttpRequests()
-                .requestMatchers("/swagger-ui/**", "/v3/api-docs/**")
-                .permitAll()
                 .anyRequest()
-                .authenticated();
+                .authenticated()
+        ;
 
         return http.build();
     }

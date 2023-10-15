@@ -7,6 +7,10 @@ spring:
 
   ## Keycloak SSO Authentication Server
   security:
+    user:
+      name: admin
+      password: admin
+      roles: ADMIN
     oauth2:
       resourceserver:
         jwt:
