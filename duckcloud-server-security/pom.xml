@@ -43,8 +43,7 @@
         </dependency>
         <dependency>
             <groupId>com.trodix</groupId>
-            <artifactId>casbin-rest-java-client</artifactId>
-            <version>0.0.1-SNAPSHOT</version>
+            <artifactId>casbin-server-spring-boot-starter</artifactId>
         </dependency>
     </dependencies>
 

@@ -1,6 +1,7 @@
 package com.trodix.duckcloud.presentation.controllers;
 
 import com.trodix.casbinserver.client.api.v1.EnforcerApi;
+import com.trodix.casbinserver.models.PermissionType;
 import com.trodix.duckcloud.domain.services.NodeService;
 import com.trodix.duckcloud.persistance.entities.Node;
 import com.trodix.duckcloud.presentation.dto.mappers.NodeMapper;
@@ -11,9 +12,8 @@ import com.trodix.duckcloud.presentation.dto.responses.ExtendedPermissionRespons
 import com.trodix.duckcloud.presentation.dto.responses.NodeResponse;
 import com.trodix.duckcloud.presentation.dto.responses.PermissionResponse;
 import com.trodix.duckcloud.presentation.dto.responses.TreeNodeResponse;
-import com.trodix.duckcloud.security.annotations.AuthResourceId;
-import com.trodix.duckcloud.security.annotations.Authorization;
-import com.trodix.duckcloud.security.models.PermissionType;
+import com.trodix.casbinserver.annotations.AuthResourceId;
+import com.trodix.casbinserver.annotations.Authorization;
 import com.trodix.duckcloud.security.services.AuthenticationService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;

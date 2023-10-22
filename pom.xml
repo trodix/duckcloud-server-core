@@ -155,7 +155,7 @@
 			</dependency>
 			<dependency>
 				<groupId>com.trodix</groupId>
-				<artifactId>casbin-rest-java-client</artifactId>
+				<artifactId>casbin-server-spring-boot-starter</artifactId>
 				<version>0.0.1-SNAPSHOT</version>
 			</dependency>
 			<dependency>

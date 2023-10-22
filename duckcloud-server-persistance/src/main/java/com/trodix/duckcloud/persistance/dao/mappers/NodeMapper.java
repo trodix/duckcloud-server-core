@@ -1,9 +1,9 @@
 package com.trodix.duckcloud.persistance.dao.mappers;
 
+import com.trodix.casbinserver.models.PermissionType;
 import com.trodix.duckcloud.persistance.entities.Node;
 import com.trodix.duckcloud.persistance.entities.TreeNode;
-import com.trodix.duckcloud.security.annotations.FilterAuthorized;
-import com.trodix.duckcloud.security.models.PermissionType;
+import com.trodix.casbinserver.annotations.FilterAuthorized;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.session.RowBounds;

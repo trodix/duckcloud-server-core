@@ -1,5 +1,6 @@
 package com.trodix.duckcloud.presentation.controllers;
 
+import com.trodix.casbinserver.models.PermissionType;
 import com.trodix.duckcloud.domain.models.ContentModel;
 import com.trodix.duckcloud.domain.models.FileStoreMetadata;
 import com.trodix.duckcloud.domain.services.NodeService;
@@ -8,8 +9,7 @@ import com.trodix.duckcloud.persistance.entities.Node;
 import com.trodix.duckcloud.persistance.utils.NodeUtils;
 import com.trodix.duckcloud.presentation.dto.mappers.NodeMapper;
 import com.trodix.duckcloud.presentation.dto.requests.NodeWithContentRequest;
-import com.trodix.duckcloud.security.annotations.Authorization;
-import com.trodix.duckcloud.security.models.PermissionType;
+import com.trodix.casbinserver.annotations.Authorization;
 import io.minio.messages.Bucket;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.annotation.security.RolesAllowed;

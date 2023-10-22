@@ -1,6 +1,6 @@
 package com.trodix.duckcloud.persistance.entities;
 
-import com.trodix.duckcloud.security.annotations.FilterResourceId;
+import com.trodix.casbinserver.annotations.FilterResourceId;
 import lombok.Data;
 
 import java.util.List;

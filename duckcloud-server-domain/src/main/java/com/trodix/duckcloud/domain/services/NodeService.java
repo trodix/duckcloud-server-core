@@ -1,6 +1,7 @@
 package com.trodix.duckcloud.domain.services;
 
 import com.trodix.casbinserver.client.api.v1.EnforcerApi;
+import com.trodix.casbinserver.models.PermissionType;
 import com.trodix.duckcloud.domain.models.*;
 import com.trodix.duckcloud.domain.search.models.NodeIndex;
 import com.trodix.duckcloud.domain.search.services.NodeIndexerService;
@@ -9,7 +10,6 @@ import com.trodix.duckcloud.domain.utils.StorageUtils;
 import com.trodix.duckcloud.persistance.dao.NodeManager;
 import com.trodix.duckcloud.persistance.entities.*;
 import com.trodix.duckcloud.persistance.utils.NodeUtils;
-import com.trodix.duckcloud.security.models.PermissionType;
 import com.trodix.duckcloud.security.services.AuthenticationService;
 import io.minio.ObjectWriteResponse;
 import lombok.RequiredArgsConstructor;

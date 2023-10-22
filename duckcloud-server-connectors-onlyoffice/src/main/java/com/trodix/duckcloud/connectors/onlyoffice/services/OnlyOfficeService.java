@@ -12,6 +12,7 @@ import com.trodix.duckcloud.domain.models.FileStoreMetadata;
 import com.trodix.duckcloud.domain.services.NodeService;
 import com.trodix.duckcloud.domain.utils.StorageUtils;
 import com.trodix.duckcloud.persistance.entities.Node;
+import com.trodix.duckcloud.persistance.entities.Property;
 import com.trodix.duckcloud.persistance.utils.NodeUtils;
 import com.trodix.duckcloud.security.services.AuthenticationService;
 import io.fusionauth.jwt.Signer;
@@ -36,6 +37,7 @@ import java.text.DateFormat;
 import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Map;
+import java.util.Optional;
 
 @RestController
 @RequiredArgsConstructor
@@ -144,7 +146,8 @@ public class OnlyOfficeService {
 
     private String generateOnlyOfficeDocumentKey(Node node) {
         OffsetDateTime createdAt = NodeUtils.getProperty(node.getProperties(), ContentModel.PROP_CREATED_AT).orElseThrow().getDateVal();
-        OffsetDateTime modifiedAt = NodeUtils.getProperty(node.getProperties(), ContentModel.PROP_MODIFIED_AT).orElseThrow().getDateVal();
+        Optional<Property> modifiedAtProp = NodeUtils.getProperty(node.getProperties(), ContentModel.PROP_MODIFIED_AT);
+        OffsetDateTime modifiedAt = modifiedAtProp.isEmpty() ? null : modifiedAtProp.get().getDateVal();
         OffsetDateTime lastModified = modifiedAt == null ? createdAt : modifiedAt;
         DateTimeFormatter df = DateTimeFormatter.ofPattern("yyyyMMddHHmmss");
         String lastModifiedFormatted = df.format(lastModified);

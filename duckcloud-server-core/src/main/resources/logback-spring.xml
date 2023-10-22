@@ -38,7 +38,10 @@
 
     <springProfile name="dev">
 
-         <logger name="org.springframework.security" level="INFO" />
+        <logger name="org.springframework" level="INFO" />
+        <logger name="org.springframework.security" level="INFO" />
+        <logger name="com.trodix.casbinserver" level="INFO" />
+        <logger name="com.trodix.casbinserver.client" level="INFO" />
 
         <logger name="org.apache.tika" level="ERROR" />
 
@@ -56,7 +59,7 @@
         <logger name="com.trodix.duckcloud.domain" level="INFO" />
         <logger name="com.trodix.duckcloud.presentation" level="INFO" />
         <logger name="com.trodix.duckcloud.security.services.PermissionService" level="INFO" />
-        <logger name="com.trodix.duckcloud.security.annotations" level="INFO" />
+        <logger name="com.trodix.casbinserver.annotations" level="INFO" />
         <logger name="com.trodix.duckcloud.security.persistance" level="INFO" />
         <logger name="com.trodix.duckcloud.connectors.onlyoffice" level="INFO" />
 

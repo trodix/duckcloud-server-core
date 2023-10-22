@@ -25,6 +25,14 @@ spring:
             client-id: duckcloud-webservice
             client-secret: mqZqOOLh9pUEXNclDI7k9Lz1AymXptWE
 
+casbin:
+  server:
+    url: "http://localhost:7015"
+    oauth2:
+      client-id: "duckcloud-webservice"
+      client-secret: "mqZqOOLh9pUEXNclDI7k9Lz1AymXptWE"
+      token-uri: "http://localhost:8080/realms/market/protocol/openid-connect/token"
+
 app:
   client:
     registration:
