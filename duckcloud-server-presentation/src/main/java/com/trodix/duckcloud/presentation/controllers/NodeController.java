@@ -6,8 +6,8 @@ import com.trodix.duckcloud.domain.services.NodeService;
 import com.trodix.duckcloud.persistance.entities.Node;
 import com.trodix.duckcloud.presentation.dto.mappers.NodeMapper;
 import com.trodix.duckcloud.presentation.dto.mappers.TreeNodeMapper;
+import com.trodix.duckcloud.presentation.dto.requests.AddPolicyRequest;
 import com.trodix.duckcloud.presentation.dto.requests.NodeRequest;
-import com.trodix.duckcloud.presentation.dto.requests.PermissionRequest;
 import com.trodix.duckcloud.presentation.dto.responses.ExtendedPermissionResponse;
 import com.trodix.duckcloud.presentation.dto.responses.NodeResponse;
 import com.trodix.duckcloud.presentation.dto.responses.PermissionResponse;
@@ -114,11 +114,11 @@ public class NodeController {
     }
 
     @PostMapping("/permissions")
-    public ResponseEntity<Void> addPermission(@Valid @RequestBody List<PermissionRequest> request) {
+    public ResponseEntity<Void> addPermission(@Valid @RequestBody List<AddPolicyRequest> request) {
 
         String userId = authenticationService.getUserId();
 
-        for (PermissionRequest permission : request) {
+        for (AddPolicyRequest permission : request) {
 
             if (!enforcer.enforce(userId, "feature:node", permission.getAct())) {
 
@@ -135,11 +135,11 @@ public class NodeController {
     }
 
     @PostMapping("/remove-permissions")
-    public ResponseEntity<Void> removePermission(@Valid @RequestBody List<PermissionRequest> request) {
+    public ResponseEntity<Void> removePermission(@Valid @RequestBody List<AddPolicyRequest> request) {
 
         String userId = authenticationService.getUserId();
 
-        for (PermissionRequest permission : request) {
+        for (AddPolicyRequest permission : request) {
 
             if (!(enforcer.enforce(userId, "feature:node", permission.getAct()) || enforcer.enforce(userId, permission.getObj(), permission.getAct()))) {
 

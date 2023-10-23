@@ -20,12 +20,6 @@ public class AuthorizationController {
 
     private final EnforcerApi enforcer;
 
-    @GetMapping("/roles")
-    public List<String> getRoles() {
-        String userId = authenticationService.getUserId();
-        return enforcer.getAllRoles();
-    }
-
     @GetMapping("/roles/-me-")
     public List<String> getRolesForUser() {
         String userId = authenticationService.getUserId();

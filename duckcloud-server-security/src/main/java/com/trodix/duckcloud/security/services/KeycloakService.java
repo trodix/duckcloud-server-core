@@ -1,5 +1,6 @@
 package com.trodix.duckcloud.security.services;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.trodix.duckcloud.security.KeycloakClientConfig;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -71,6 +72,12 @@ public class KeycloakService {
     }
 
     public List<UserRepresentation> fetchUsers() {
-        throw new NotImplementedException("Unable to fetch users");
+        ResponseEntity<UserRepresentation[]> response = keycloakClient().getForEntity("/users", UserRepresentation[].class);
+
+        if (response.getStatusCode().is2xxSuccessful()) {
+            return List.of(response.getBody());
+        }
+
+        throw new RuntimeException("Unable to fetch client scopes. HTTP Code: " + response.getStatusCode().value());
     }
 }

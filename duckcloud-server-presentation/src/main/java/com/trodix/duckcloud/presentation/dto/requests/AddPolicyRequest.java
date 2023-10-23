@@ -3,7 +3,7 @@ package com.trodix.duckcloud.presentation.dto.requests;
 import lombok.Data;
 
 @Data
-public class PermissionRequest {
+public class AddPolicyRequest {
 
     private String sub;
     private String obj;
