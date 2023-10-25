@@ -1,9 +1,11 @@
 package com.trodix.duckcloud.presentation.dto.requests;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
 
 @Data
-public class AddPolicyRequest {
+@AllArgsConstructor
+public class PolicyDto {
 
     private String sub;
     private String obj;
