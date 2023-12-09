@@ -1,7 +1,7 @@
 version: '3.9'
 
 services:
-  postgres_duckcloud:
+  postgres:
     image: postgres:15.0
     environment:
       POSTGRES_DB: duckcloud
@@ -13,6 +13,20 @@ services:
       - duckcloud-network
     volumes:
       - duckcloud_postgres_data:/var/lib/postgresql/data
+
+  postgres_kc:
+    image: postgres:15.0
+    environment:
+      POSTGRES_DB: keycloak
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    networks:
+      - duckcloud-network
+    volumes:
+      - keycloak-demo_postgres_data:/var/lib/postgresql/data
+      - ./keycloak-demo/keycloak/db/:/docker-entrypoint-initdb.d/
 
   minio:
     image: minio/minio:RELEASE.2023-01-20T02-05-44Z.fips
@@ -28,10 +42,164 @@ services:
     networks:
       - duckcloud-network
 
+  elasticsearch:
+    image: elasticsearch:7.17.3
+    container_name: elasticsearch
+    ports:
+      - 9200:9200
+      - 9300:9300
+    environment:
+      xpack.security.enabled: "false"
+      ES_JAVA_OPTS: -Xms512m -Xmx512m
+      discovery.type: single-node
+      # ELASTIC_PASSWORD: ${ELASTIC_PASSWORD}
+    networks:
+      - duckcloud-network
+    volumes:
+      - elasticsearch_data:/usr/share/elasticsearch/data
+
+  kibana:
+    image: kibana:7.17.3
+    container_name: kibana
+    ports:
+      - 5601:5601
+      - 9600:9600
+    environment:
+      ES_JAVA_OPTS: -Xmx512m -Xms512m
+      SERVERNAME: kibana
+      ELASTICSEARCH_HOSTS: http://elasticsearch:9200
+      ELASTICSEARCH_USERNAME: kibana_system
+      # ELASTICSEARCH_PASSWORD: ${KIBANA_PASSWORD}
+    networks:
+      - duckcloud-network
+    volumes:
+      - kibana_data:/usr/share/kibana/data
+
+  keycloak:
+    image: keycloak/keycloak:22.0.5
+    environment:
+      KC_DB: postgres
+      KC_DB_SCHEMA: public
+      KC_DB_URL_DATABASE: keycloak
+      KC_DB_URL_HOST: postgres_kc
+      KC_DB_URL_PORT: 5432
+      KC_DB_USERNAME: postgres
+      KC_DB_PASSWORD: postgres
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: admin
+      KC_HOSTNAME_STRICT: "false"
+      KC_LOG_LEVEL: DEBUG
+    ports:
+      - 8080:8080
+    entrypoint: /opt/keycloak/bin/kc.sh start-dev
+    depends_on:
+      - postgres_kc
+      - openldap
+    networks:
+      - duckcloud-network
+
+  openldap:
+    image: docker.io/bitnami/openldap:2.6
+    environment:
+      LDAP_ROOT: dc=trodix,dc=com
+      LDAP_ADMIN_USERNAME: admin
+      LDAP_ADMIN_PASSWORD: admin
+      LDAP_CUSTOM_LDIF_DIR: /ldifs
+    ports:
+      - 1389:1389
+      - 1636:1636
+    networks:
+      - duckcloud-network
+    volumes:
+      - keycloak-demo_openldap_data:/bitnami/openldap
+      - ./ldap/bootstrap:/ldifs
+
+  smtp4dev:
+    image: rnwood/smtp4dev:v3
+    ports:
+      - 1080:80
+      - 127.0.0.1:1025:25
+      - 143:143
+    volumes:
+      - smtp4dev-data:/smtp4dev
+
+
+### OnlyOffice server services below
+
+  onlyoffice-documentserver:
+    image: onlyoffice/documentserver:7.3.2.8
+    container_name: onlyoffice-documentserver
+    depends_on:
+      - onlyoffice-postgresql
+      - onlyoffice-rabbitmq
+    environment:
+      - DB_TYPE=postgres
+      - DB_HOST=onlyoffice-postgresql
+      - DB_PORT=5433
+      - DB_NAME=onlyoffice
+      - DB_USER=onlyoffice
+      - AMQP_URI=amqp://guest:guest@onlyoffice-rabbitmq
+      # Uncomment strings below to enable the JSON Web Token validation.
+      - JWT_ENABLED=true
+      - JWT_SECRET=WlEJf7hdzCEGwTWkO89i
+      - JWT_HEADER=Authorization
+      - JWT_IN_BODY=false
+      - WOPI_ENABLED=true
+    ports:
+      - '6080:80'
+      - '6443:443'
+    stdin_open: true
+    #restart: always
+    stop_grace_period: 60s
+    volumes:
+      #  - /var/www/onlyoffice/Data
+      #  - /var/log/onlyoffice
+      #  - /var/lib/onlyoffice/documentserver/App_Data/cache/files
+      #  - /var/www/onlyoffice/documentserver-example/public/files
+      #  - /usr/share/fonts
+      - ./DocumentServer/log/onlyoffice:/var/log/onlyoffice
+      - ./DocumentServer/www/onlyoffice/data:/var/www/onlyoffice/Data
+      - ./DocumentServer/lib/onlyoffice:/var/lib/onlyoffice
+      - ./DocumentServer/lib/postgresql:/var/lib/postgresql
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    networks:
+      - duckcloud-network
+
+  onlyoffice-rabbitmq:
+    container_name: onlyoffice-rabbitmq
+    image: rabbitmq
+    #restart: always
+    expose:
+      - '5672'
+    networks:
+      - duckcloud-network
+
+  onlyoffice-postgresql:
+    container_name: onlyoffice-postgresql
+    image: postgres:15.0
+    environment:
+      POSTGRES_DB: keycloak
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_HOST_AUTH_METHOD: trust
+    ports:
+      - "5433:5432"
+    volumes:
+      - onlyoffice_postgresql_data:/var/lib/postgresql
+    networks:
+      - duckcloud-network
+
 networks:
   duckcloud-network:
     driver: bridge
 
 volumes:
   duckcloud_postgres_data:
-    external: false
+  keycloak-demo_postgres_data:
+  onlyoffice_postgresql_data:
+  elasticsearch_data:
+  kibana_data:
+  pdf-sign_postgres_data:
+  keycloak-demo_openldap_data:
+  smtp4dev-data:
