@@ -10,7 +10,7 @@
     </parent>
 
     <groupId>com.trodix.duckcloud.connectors.onlyoffice</groupId>
-    <artifactId>duckcloud-server-connectors-onlyoffice</artifactId>
+    <artifactId>connectors-onlyoffice</artifactId>
 
     <properties>
         <maven.compiler.source>17</maven.compiler.source>
@@ -21,7 +21,7 @@
     <dependencies>
         <dependency>
             <groupId>com.trodix.duckcloud.presentation</groupId>
-            <artifactId>duckcloud-server-presentation</artifactId>
+            <artifactId>presentation</artifactId>
             <version>${project.parent.version}</version>
         </dependency>
 

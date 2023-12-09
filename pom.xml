@@ -19,13 +19,13 @@
 	<packaging>pom</packaging>
 
     <modules>
-		<module>duckcloud-server-core</module>
-        <module>duckcloud-server-persistance</module>
-		<module>duckcloud-server-domain</module>
-		<module>duckcloud-server-presentation</module>
-		<module>duckcloud-server-security</module>
-		<module>duckcloud-server-connectors</module>
-		<module>duckcloud-server-connectors-onlyoffice</module>
+		<module>core</module>
+        <module>persistance</module>
+		<module>domain</module>
+		<module>presentation</module>
+		<module>security</module>
+		<module>connectors</module>
+		<module>connectors-onlyoffice</module>
     </modules>
 
     <properties>

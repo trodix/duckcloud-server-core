@@ -10,7 +10,7 @@
     </parent>
 
     <groupId>com.trodix.duckcloud.core</groupId>
-    <artifactId>duckcloud-server-core</artifactId>
+    <artifactId>core</artifactId>
 
     <properties>
         <maven.compiler.source>17</maven.compiler.source>
@@ -21,17 +21,17 @@
     <dependencies>
         <dependency>
             <groupId>com.trodix.duckcloud.security</groupId>
-            <artifactId>duckcloud-server-security</artifactId>
+            <artifactId>security</artifactId>
             <version>${project.parent.version}</version>
         </dependency>
         <dependency>
             <groupId>com.trodix.duckcloud.presentation</groupId>
-            <artifactId>duckcloud-server-presentation</artifactId>
+            <artifactId>presentation</artifactId>
             <version>${project.parent.version}</version>
         </dependency>
         <dependency>
             <groupId>com.trodix.duckcloud.connectors</groupId>
-            <artifactId>duckcloud-server-connectors</artifactId>
+            <artifactId>connectors</artifactId>
             <version>${project.parent.version}</version>
         </dependency>
 

@@ -9,8 +9,8 @@
         <version>0.0.1-SNAPSHOT</version>
     </parent>
 
-    <groupId>com.trodix.duckcloud.connectors</groupId>
-    <artifactId>duckcloud-server-connectors</artifactId>
+    <groupId>com.trodix.duckcloud.domain</groupId>
+    <artifactId>domain</artifactId>
 
     <properties>
         <maven.compiler.source>17</maven.compiler.source>
@@ -20,9 +20,23 @@
 
     <dependencies>
         <dependency>
-            <groupId>com.trodix.duckcloud.connectors.onlyoffice</groupId>
-            <artifactId>duckcloud-server-connectors-onlyoffice</artifactId>
+            <groupId>com.trodix.duckcloud.persistance</groupId>
+            <artifactId>persistance</artifactId>
             <version>${project.parent.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.minio</groupId>
+            <artifactId>minio</artifactId>
+            <version>${minio-client.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.tika</groupId>
+            <artifactId>tika-parsers</artifactId>
+            <version>${tika-parsers.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-elasticsearch</artifactId>
         </dependency>
     </dependencies>
 
