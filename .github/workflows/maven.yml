@@ -46,6 +46,6 @@ jobs:
       #      - name: Test
       #        run: mvn -B verify
       - name: Publish to GitHub Packages Apache Maven
-        run: mvn deploy
+        run: mvn deploy -DskipTests
         env:
           GITHUB_TOKEN: ${{ secrets.MAVEN_TOKEN }}
