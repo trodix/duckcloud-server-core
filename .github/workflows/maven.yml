@@ -27,7 +27,13 @@ jobs:
         with:
           java-version: '17'
           distribution: 'adopt'
+          server-id: github # Value of the distributionManagement/repository/id field of the pom.xml
+          settings-path: ${{ github.workspace }} # location for the settings.xml file
       - name: Build
         run: mvn -B clean compile
       - name: Test
         run: mvn -B verify
+      - name: Publish to GitHub Packages Apache Maven
+        run: mvn deploy -s $GITHUB_WORKSPACE/settings.xml
+        env:
+          GITHUB_TOKEN: ${{ secrets.MAVEN_TOKEN }}

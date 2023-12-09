@@ -18,6 +18,14 @@
 
 	<packaging>pom</packaging>
 
+	<distributionManagement>
+		<repository>
+			<id>github</id>
+			<name>GitHub trodix Apache Maven Packages</name>
+			<url>https://maven.pkg.github.com/trodix/duckcloud-server</url>
+		</repository>
+	</distributionManagement>
+
     <modules>
 		<module>core</module>
         <module>persistance</module>
