@@ -30,13 +30,22 @@ jobs:
         with:
           java-version: '17'
           distribution: 'adopt'
-          server-id: github # Value of the distributionManagement/repository/id field of the pom.xml
-          settings-path: ${{ github.workspace }} # location for the settings.xml file
+      - name: Setup Maven settings.xml
+        uses: whelk-io/maven-settings-xml-action@v20
+        with:
+          servers: >
+            [
+              {
+                "id": "github",
+                "username": "trodix",
+                "password": "${{ secrets.MAVEN_TOKEN }}"
+              }
+            ]
       - name: Build
         run: mvn -B clean compile
-#      - name: Test
-#        run: mvn -B verify
+      #      - name: Test
+      #        run: mvn -B verify
       - name: Publish to GitHub Packages Apache Maven
-        run: mvn deploy -s $GITHUB_WORKSPACE/settings.xml -DskipTests
+        run: mvn deploy
         env:
           GITHUB_TOKEN: ${{ secrets.MAVEN_TOKEN }}
