@@ -26,7 +26,20 @@ services:
       - duckcloud-network
     volumes:
       - keycloak-demo_postgres_data:/var/lib/postgresql/data
-      - ./keycloak-demo/keycloak/db/:/docker-entrypoint-initdb.d/
+      - ./data/keycloak-demo/keycloak/db/:/docker-entrypoint-initdb.d/
+
+  postgres_casbin:
+    image: postgres:15.4
+    environment:
+      POSTGRES_DB: casbin
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5435:5432"
+    networks:
+      - duckcloud-network
+    volumes:
+      - casbin_postgres_data:/var/lib/postgresql/data
 
   minio:
     image: minio/minio:RELEASE.2023-01-20T02-05-44Z.fips
@@ -88,10 +101,12 @@ services:
       KEYCLOAK_ADMIN: admin
       KEYCLOAK_ADMIN_PASSWORD: admin
       KC_HOSTNAME_STRICT: "false"
-      KC_LOG_LEVEL: DEBUG
+      #KC_LOG_LEVEL: DEBUG
     ports:
       - 8080:8080
     entrypoint: /opt/keycloak/bin/kc.sh start-dev
+    volumes:
+      - ./keycloak/import:/opt/keycloak/data/import
     depends_on:
       - postgres_kc
       - openldap
@@ -111,7 +126,7 @@ services:
     networks:
       - duckcloud-network
     volumes:
-      - keycloak-demo_openldap_data:/bitnami/openldap
+      - openldap_data:/bitnami/openldap
       - ./ldap/bootstrap:/ldifs
 
   smtp4dev:
@@ -123,7 +138,26 @@ services:
     volumes:
       - smtp4dev-data:/smtp4dev
 
+  casbin-server:
+    image: ghcr.io/trodix/casbin-server:0.0.1-snapshot
+    ports:
+      - 7015:7015
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+      SPRING_DATASOURCE_DRIVERCLASSNAME: org.postgresql.Driver
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres_casbin:5432/casbin
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: postgres
+      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUERURI: http://trodix.local:8080/realms/market
+      SPRING_SECURITY_OAUTH2_CLIENT_PROVIDER_MARKET_TOKENURI: http://trodix.local:8080/realms/market/protocol/openid-connect/token
+      SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_MARKET_AUTHORIZATIONGRANTTYPE: client_credentials
+      SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_MARKET_CLIENTID: duckcloud-webservice
+      SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_MARKET_CLIENTSECRET: QOUUWPnujmoFwpiTduxjCD7yAhpdl8Jj
+      APP_AUTH_ALLOWED_ORIGINS: "*"
+    networks:
+      - duckcloud-network
 
+#####################################
 ### OnlyOffice server services below
 
   onlyoffice-documentserver:
@@ -135,7 +169,7 @@ services:
     environment:
       - DB_TYPE=postgres
       - DB_HOST=onlyoffice-postgresql
-      - DB_PORT=5433
+      - DB_PORT=5432
       - DB_NAME=onlyoffice
       - DB_USER=onlyoffice
       - AMQP_URI=amqp://guest:guest@onlyoffice-rabbitmq
@@ -149,18 +183,12 @@ services:
       - '6080:80'
       - '6443:443'
     stdin_open: true
-    #restart: always
     stop_grace_period: 60s
     volumes:
-      #  - /var/www/onlyoffice/Data
-      #  - /var/log/onlyoffice
-      #  - /var/lib/onlyoffice/documentserver/App_Data/cache/files
-      #  - /var/www/onlyoffice/documentserver-example/public/files
-      #  - /usr/share/fonts
-      - ./DocumentServer/log/onlyoffice:/var/log/onlyoffice
-      - ./DocumentServer/www/onlyoffice/data:/var/www/onlyoffice/Data
-      - ./DocumentServer/lib/onlyoffice:/var/lib/onlyoffice
-      - ./DocumentServer/lib/postgresql:/var/lib/postgresql
+      - DocumentServer_log:/var/log/onlyoffice
+      - DocumentServer_data:/var/www/onlyoffice/Data
+      - DocumentServer_lib_oo:/var/lib/onlyoffice
+      - DocumentServer_lib_postgresql:/var/lib/postgresql
     extra_hosts:
       - "host.docker.internal:host-gateway"
     networks:
@@ -177,11 +205,10 @@ services:
 
   onlyoffice-postgresql:
     container_name: onlyoffice-postgresql
-    image: postgres:15.0
+    image: postgres:9.5
     environment:
-      POSTGRES_DB: keycloak
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: onlyoffice
+      POSTGRES_USER: onlyoffice
       POSTGRES_HOST_AUTH_METHOD: trust
     ports:
       - "5433:5432"
@@ -197,9 +224,13 @@ networks:
 volumes:
   duckcloud_postgres_data:
   keycloak-demo_postgres_data:
-  onlyoffice_postgresql_data:
+  casbin_postgres_data:
   elasticsearch_data:
   kibana_data:
-  pdf-sign_postgres_data:
-  keycloak-demo_openldap_data:
+  openldap_data:
   smtp4dev-data:
+  onlyoffice_postgresql_data:
+  DocumentServer_log:
+  DocumentServer_data:
+  DocumentServer_lib_oo:
+  DocumentServer_lib_postgresql:

@@ -14,30 +14,30 @@ spring:
     oauth2:
       resourceserver:
         jwt:
-          issuer-uri: http://localhost:8080/realms/market
+          issuer-uri: http://trodix.local:8080/realms/market
       client:
         provider:
           market:
-            token-uri: http://localhost:8080/realms/market/protocol/openid-connect/token
+            token-uri: http://trodix.local:8080/realms/market/protocol/openid-connect/token
         registration:
           market:
             authorization-grant-type: client_credentials
             client-id: duckcloud-webservice
-            client-secret: mqZqOOLh9pUEXNclDI7k9Lz1AymXptWE
+            client-secret: QOUUWPnujmoFwpiTduxjCD7yAhpdl8Jj
 
 casbin:
   server:
     url: "http://localhost:7015"
     oauth2:
       client-id: "duckcloud-webservice"
-      client-secret: "mqZqOOLh9pUEXNclDI7k9Lz1AymXptWE"
-      token-uri: "http://localhost:8080/realms/market/protocol/openid-connect/token"
+      client-secret: "QOUUWPnujmoFwpiTduxjCD7yAhpdl8Jj"
+      token-uri: "http://trodix.local:8080/realms/market/protocol/openid-connect/token"
 
 app:
   client:
     registration:
       name: market
-      keycloak-admin-uri: http://localhost:8080/admin/realms/market
+      keycloak-admin-uri: http://trodix.local:8080/admin/realms/market
   auth:
     allowed-origins: http://localhost:4200
   storage:
