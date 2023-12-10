@@ -1,0 +1,44 @@
+version: 1
+
+dn: dc=trodix,dc=com
+objectClass: dcObject
+objectClass: organization
+dc: trodix
+o: example
+
+dn: ou=users,dc=trodix,dc=com
+objectClass: organizationalUnit
+ou: users
+
+dn: cn=user01,ou=users,dc=trodix,dc=com
+objectClass: inetOrgPerson
+objectClass: posixAccount
+objectClass: shadowAccount
+cn: user01
+cn: User1
+gidNumber: 1000
+homeDirectory: /home/user01
+sn: Bar1
+uid: user01
+uidNumber: 1000
+userPassword:: dXNlcjE=
+
+dn: cn=user02,ou=users,dc=trodix,dc=com
+objectClass: inetOrgPerson
+objectClass: posixAccount
+objectClass: shadowAccount
+cn: user02
+cn: User2
+gidNumber: 1001
+homeDirectory: /home/user02
+sn: Bar2
+uid: user02
+uidNumber: 1001
+userPassword:: dXNlcjI=
+
+dn: cn=readers,ou=users,dc=trodix,dc=com
+objectClass: groupOfNames
+cn: readers
+member: cn=user01,ou=users,dc=trodix,dc=com
+member: cn=user02,ou=users,dc=trodix,dc=com
+
