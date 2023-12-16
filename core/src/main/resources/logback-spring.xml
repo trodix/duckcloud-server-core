@@ -39,8 +39,8 @@
     <springProfile name="dev">
 
         <logger name="org.springframework" level="INFO" />
-        <logger name="org.springframework.security" level="debug" />
-        <logger name="com.trodix.casbinserver" level="INFO" />
+        <logger name="org.springframework.security" level="INFO" />
+        <logger name="com.trodix.casbinserver" level="DEBUG" />
         <logger name="com.trodix.casbinserver.client" level="INFO" />
 
         <logger name="org.apache.tika" level="ERROR" />

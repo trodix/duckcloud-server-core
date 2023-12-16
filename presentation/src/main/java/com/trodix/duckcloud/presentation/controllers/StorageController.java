@@ -34,7 +34,6 @@ import java.util.List;
 @RequestMapping("/api/v1/storage")
 @RequiredArgsConstructor
 @Slf4j
-@RolesAllowed({"ecm-user"})
 public class StorageController {
 
     private final StorageService storageService;
