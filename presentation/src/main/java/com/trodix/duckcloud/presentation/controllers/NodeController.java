@@ -2,10 +2,15 @@ package com.trodix.duckcloud.presentation.controllers;
 
 import com.trodix.casbinserver.client.api.v1.EnforcerApi;
 import com.trodix.casbinserver.models.PermissionType;
+import com.trodix.duckcloud.domain.models.ContentModel;
 import com.trodix.duckcloud.domain.services.NodeService;
+import com.trodix.duckcloud.domain.utils.ModelUtils;
 import com.trodix.duckcloud.persistance.entities.Node;
+import com.trodix.duckcloud.persistance.entities.Type;
+import com.trodix.duckcloud.persistance.utils.NodeUtils;
 import com.trodix.duckcloud.presentation.dto.mappers.NodeMapper;
 import com.trodix.duckcloud.presentation.dto.mappers.TreeNodeMapper;
+import com.trodix.duckcloud.presentation.dto.requests.NodeMoveRequest;
 import com.trodix.duckcloud.presentation.dto.requests.PolicyDto;
 import com.trodix.duckcloud.presentation.dto.requests.NodeRequest;
 import com.trodix.duckcloud.presentation.dto.responses.ExtendedPermissionResponse;
@@ -29,6 +34,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.ArrayList;
@@ -87,8 +93,30 @@ public class NodeController {
     public void update(@PathVariable @AuthResourceId Long id, @RequestBody @Valid NodeRequest request) {
 
         final Node data = nodeMapper.toEntity(request);
+        final Node nodeInDB = nodeService.getOne(id).orElseThrow(() -> new HttpClientErrorException(HttpStatus.NOT_FOUND, "Node with id " + id + " not found"));
         data.setId(id);
+        if (!nodeInDB.getParentId().equals(data.getParentId())) {
+            new HttpClientErrorException(HttpStatus.BAD_REQUEST, "To move the node, use the move API");
+        }
         nodeService.update(data);
+    }
+
+    @PutMapping("/{id}/move")
+    @Authorization(resourceType = "feature:node", permissionType = PermissionType.WRITE)
+    public void move(@PathVariable @AuthResourceId Long id, @RequestBody @Valid NodeMoveRequest request) {
+
+        final Node source = nodeService.getOne(id)
+                .orElseThrow(() -> new HttpClientErrorException(HttpStatus.NOT_FOUND, "Source node not found with id " + id));
+
+        final Node destination = nodeService.getOne(request.getDestinationId())
+                .orElseThrow(() -> new HttpClientErrorException(HttpStatus.NOT_FOUND, "Destination node not found with id " + request.getDestinationId()));
+
+        if (!ModelUtils.isDirectoryType(destination)) {
+            throw new IllegalArgumentException("Destination node must be of type " + ContentModel.TYPE_DIRECTORY);
+        }
+
+        source.setParentId(destination.getId());
+        nodeService.update(source);
     }
 
     @DeleteMapping("/{id}")

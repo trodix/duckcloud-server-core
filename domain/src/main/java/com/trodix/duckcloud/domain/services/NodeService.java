@@ -213,8 +213,22 @@ public class NodeService {
         setModifiedAuthorProperties(node);
         // merge updated properties with existing properties
         Node existingNode = getOne(node.getId()).orElseThrow(() -> new IllegalArgumentException("Trying to update a node not found in database"));
+
+        // merge type
+        if (node.getType() != null && !node.getType().equals(existingNode.getType())) {
+            existingNode.setType(node.getType());
+        }
+
+        // merge parentId (move)
+        if (node.getParentId() != null && !node.getParentId().equals(existingNode.getParentId())) {
+            existingNode.setParentId(node.getParentId());
+        }
+
+        // TODO merge tags
+
+        // merge properties
         NodeUtils.addProperties(existingNode, node.getProperties());
-        // existingNode object has been updated with new node properties
+
         nodeManager.update(existingNode);
         indexNode(existingNode);
     }
