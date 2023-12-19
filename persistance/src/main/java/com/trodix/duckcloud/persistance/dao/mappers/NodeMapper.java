@@ -4,6 +4,7 @@ import com.trodix.casbinserver.models.PermissionType;
 import com.trodix.duckcloud.persistance.entities.Node;
 import com.trodix.duckcloud.persistance.entities.TreeNode;
 import com.trodix.casbinserver.annotations.FilterAuthorized;
+import com.trodix.duckcloud.persistance.pagination.Pagination;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.session.RowBounds;
@@ -27,7 +28,12 @@ public interface NodeMapper {
     @FilterAuthorized(resourceType = "feature:node", permissionType = PermissionType.READ)
     List<Node> findAllByParentId(Long parentId);
 
+    @FilterAuthorized(resourceType = "feature:node", permissionType = PermissionType.READ)
+    List<Node> findAllByParentIdPaginated(Long parentId, Pagination pagination);
+
     List<Node> findAllTypeContentPageable(RowBounds rowbounds);
+
+    long countByParentId(Long parentId);
 
     long count();
 

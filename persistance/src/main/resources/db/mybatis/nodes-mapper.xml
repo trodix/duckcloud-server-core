@@ -114,8 +114,20 @@
         WHERE n.parent_id = #{parentId}
     </select>
 
+    <select id="findAllByParentIdPaginated" resultMap="result_Node">
+        <include refid="select_node" />
+        WHERE n.parent_id = #{parentId}
+        OFFSET #{pagination.offset}
+        LIMIT #{pagination.pageSize}
+    </select>
+
     <select id="count" resultType="java.lang.Long">
         SELECT COUNT(n.id) FROM nodes n
+    </select>
+
+    <select id="countByParentId" resultType="java.lang.Long">
+        SELECT COUNT(n.id) FROM nodes n
+        WHERE n.parent_id = #{parentId}
     </select>
 
     <insert id="insert" useGeneratedKeys="true" keyProperty="id" keyColumn="id">

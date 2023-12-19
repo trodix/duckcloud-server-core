@@ -9,6 +9,8 @@ import com.trodix.duckcloud.domain.utils.ModelUtils;
 import com.trodix.duckcloud.domain.utils.StorageUtils;
 import com.trodix.duckcloud.persistance.dao.NodeManager;
 import com.trodix.duckcloud.persistance.entities.*;
+import com.trodix.duckcloud.persistance.pagination.Pagination;
+import com.trodix.duckcloud.persistance.pagination.PaginationResult;
 import com.trodix.duckcloud.persistance.utils.NodeUtils;
 import com.trodix.duckcloud.security.services.AuthenticationService;
 import io.minio.ObjectWriteResponse;
@@ -22,6 +24,7 @@ import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -48,15 +51,22 @@ public class NodeService {
         return nodeManager.findAll();
     }
 
-    public List<Node> getChildren(Long id) {
-        return nodeManager.findAllByParentId(id);
+    public List<Node> getChildren(Long nodeId) {
+        return nodeManager.findAllByParentId(nodeId);
     }
 
-    public List<NodeWithPath> getChildrenWithPath(Long id) {
+    public PaginationResult<List<Node>> getChildren(Long nodeId, Pagination pagination) {
+        return nodeManager.findAllByParentId(nodeId, pagination);
+    }
+
+    public PaginationResult<List<NodeWithPath>> getChildrenWithPath(Long id, Pagination pagination) {
         List<String> path = nodeManager.buildTreeFromParent(id).stream().map(tn -> tn.getNodePath()).toList().get(0);
         List<Node> parentNodes = nodeManager.findAllByNodeId(path.stream().map(p -> Long.valueOf(p)).toList());
         List<NodePath> pathObj = parentNodes.stream().map(n -> new NodePath(n.getId(), NodeUtils.getProperty(n.getProperties(), ContentModel.PROP_NAME).get().getStringVal())).toList();
-        return getChildren(id).stream().map(n -> {
+
+        PaginationResult<List<Node>> result = getChildren(id, pagination);
+
+        return new PaginationResult<>(result.getOffset(), result.getPageSize(), result.getTotal(), result.getEntries().stream().map(n -> {
             NodeWithPath nodeWithPath = new NodeWithPath();
             nodeWithPath.setId(n.getId());
             nodeWithPath.setParentId(n.getParentId());
@@ -66,7 +76,7 @@ public class NodeService {
             nodeWithPath.setPath(pathObj);
 
             return nodeWithPath;
-        }).toList();
+        }).collect(Collectors.toList()));
     }
 
     public Optional<NodeWithPath> getOneNodeWithRecursiveParents(Long nodeId) {

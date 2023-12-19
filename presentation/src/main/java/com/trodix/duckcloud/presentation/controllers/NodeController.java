@@ -1,24 +1,25 @@
 package com.trodix.duckcloud.presentation.controllers;
 
+import com.trodix.casbinserver.annotations.AuthResourceId;
+import com.trodix.casbinserver.annotations.Authorization;
 import com.trodix.casbinserver.client.api.v1.EnforcerApi;
 import com.trodix.casbinserver.models.PermissionType;
 import com.trodix.duckcloud.domain.models.ContentModel;
+import com.trodix.duckcloud.domain.models.NodeWithPath;
 import com.trodix.duckcloud.domain.services.NodeService;
 import com.trodix.duckcloud.domain.utils.ModelUtils;
 import com.trodix.duckcloud.persistance.entities.Node;
-import com.trodix.duckcloud.persistance.entities.Type;
-import com.trodix.duckcloud.persistance.utils.NodeUtils;
+import com.trodix.duckcloud.persistance.pagination.Pagination;
+import com.trodix.duckcloud.persistance.pagination.PaginationResult;
 import com.trodix.duckcloud.presentation.dto.mappers.NodeMapper;
 import com.trodix.duckcloud.presentation.dto.mappers.TreeNodeMapper;
 import com.trodix.duckcloud.presentation.dto.requests.NodeMoveRequest;
-import com.trodix.duckcloud.presentation.dto.requests.PolicyDto;
 import com.trodix.duckcloud.presentation.dto.requests.NodeRequest;
+import com.trodix.duckcloud.presentation.dto.requests.PolicyDto;
 import com.trodix.duckcloud.presentation.dto.responses.ExtendedPermissionResponse;
 import com.trodix.duckcloud.presentation.dto.responses.NodeResponse;
 import com.trodix.duckcloud.presentation.dto.responses.PermissionResponse;
 import com.trodix.duckcloud.presentation.dto.responses.TreeNodeResponse;
-import com.trodix.casbinserver.annotations.AuthResourceId;
-import com.trodix.casbinserver.annotations.Authorization;
 import com.trodix.duckcloud.security.services.AuthenticationService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -26,14 +27,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.SetUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -63,21 +57,24 @@ public class NodeController {
         return nodeMapper.toDto2(nodeService.getOneNodeWithRecursiveParents(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Node not found for id " + id)));
     }
 
-    @GetMapping("")
-    public List<NodeResponse> getAll() {
-        List<Node> result = nodeService.getAll();
-        List<NodeResponse> response = nodeMapper.toDto(result);
-        return response;
-    }
-
     @GetMapping("/tree/{parentId}")
     public List<TreeNodeResponse> getTreePrimaryChildren(@PathVariable Long parentId) {
+        // TODO pagination
         return treeNodeMapper.toDto(nodeService.buildTreeFromParent(parentId));
     }
 
     @GetMapping("/{parentId}/children")
-    public List<NodeResponse> getChildren(@PathVariable Long parentId) {
-        return nodeMapper.toDto2(nodeService.getChildrenWithPath(parentId));
+    public PaginationResult<List<NodeResponse>> getChildren(@PathVariable Long parentId, @RequestParam(defaultValue = "0") int offset, @RequestParam(defaultValue = "50") int limit) {
+        PaginationResult<List<NodeWithPath>> result = nodeService.getChildrenWithPath(parentId, new Pagination(offset, limit));
+        return new PaginationResult<>(
+                result.getOffset(),
+                result.getPageSize(),
+                result.getTotal(),
+                result.getEntries()
+                    .stream()
+                    .map(t -> nodeMapper.toDto2(t))
+                    .toList()
+        );
     }
 
     @PostMapping("")

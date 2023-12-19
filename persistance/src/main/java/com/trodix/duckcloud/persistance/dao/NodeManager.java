@@ -5,6 +5,8 @@ import com.trodix.duckcloud.persistance.dao.mappers.PropertyMapper;
 import com.trodix.duckcloud.persistance.dao.mappers.TagMapper;
 import com.trodix.duckcloud.persistance.dao.mappers.TypeMapper;
 import com.trodix.duckcloud.persistance.entities.*;
+import com.trodix.duckcloud.persistance.pagination.Pagination;
+import com.trodix.duckcloud.persistance.pagination.PaginationResult;
 import com.trodix.duckcloud.persistance.utils.NodeUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -61,6 +63,15 @@ public class NodeManager {
 
     public List<Node> findAllByParentId(Long parentId) {
         return nodeMapper.findAllByParentId(parentId);
+    }
+
+    public PaginationResult<List<Node>> findAllByParentId(Long parentId, Pagination pagination) {
+        return new PaginationResult(
+                pagination.getOffset(),
+                pagination.getPageSize(),
+                (int) nodeMapper.countByParentId(parentId),
+                nodeMapper.findAllByParentIdPaginated(parentId, pagination)
+        );
     }
 
     public List<TreeNode> buildTreeFromParent(Long parentId) {
