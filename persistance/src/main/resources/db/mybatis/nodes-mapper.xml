@@ -59,9 +59,14 @@
         <include refid="select_node" />
     </select>
 
-    <select id="findAllTypeContentPageable" resultMap="result_Node">
+    <select id="findAllTypeContentPaginated" resultMap="result_Node">
         <include refid="select_node" />
-        WHERE t.name = 'cm:content'
+        WHERE n.id in (
+            SELECT n.id FROM nodes n
+            WHERE t.name = 'cm:content'
+            OFFSET #{pagination.offset}
+            LIMIT #{pagination.pageSize}
+        )
     </select>
 
     <select id="findTreeNodesByParentId" resultMap="result_TreeNode">
@@ -116,9 +121,12 @@
 
     <select id="findAllByParentIdPaginated" resultMap="result_Node">
         <include refid="select_node" />
-        WHERE n.parent_id = #{parentId}
-        OFFSET #{pagination.offset}
-        LIMIT #{pagination.pageSize}
+        WHERE n.id in (
+            SELECT n.id FROM nodes n
+            WHERE n.parent_id = #{parentId}
+            OFFSET #{pagination.offset}
+            LIMIT #{pagination.pageSize}
+        )
     </select>
 
     <select id="count" resultType="java.lang.Long">

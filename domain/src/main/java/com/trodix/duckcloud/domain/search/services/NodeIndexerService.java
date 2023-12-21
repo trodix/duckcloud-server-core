@@ -5,6 +5,8 @@ import com.trodix.duckcloud.domain.services.NodeContentService;
 import com.trodix.duckcloud.domain.utils.ModelUtils;
 import com.trodix.duckcloud.persistance.dao.NodeManager;
 import com.trodix.duckcloud.persistance.entities.Node;
+import com.trodix.duckcloud.persistance.pagination.Pagination;
+import com.trodix.duckcloud.persistance.pagination.PaginationResult;
 import com.trodix.duckcloud.persistance.utils.NodeUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -58,9 +60,9 @@ public class NodeIndexerService {
         final List<Future<?>> runningTasks = new ArrayList<>();
 
         for (int pageIndex = 0; pageIndex < pageCount; pageIndex++) {
-            final List<Node> page = nodeManager.findAllTypeContent(0, 100);
+            final PaginationResult<List<Node>> page = nodeManager.findAllTypeContent(new Pagination(BATCH_SIZE * pageIndex, BATCH_SIZE));
 
-            final List<NodeIndex> nodeIndexChunk = page.stream().map(this::buildIndex).toList();
+            final List<NodeIndex> nodeIndexChunk = page.getEntries().stream().map(this::buildIndex).toList();
 
             final Runnable task = () -> createNodeIndexBulk(nodeIndexChunk);
             log.debug("Adding new task to thread pool with page {}/{} ({} records)", pageIndex + 1, pageCount, count);

@@ -42,15 +42,13 @@ public class NodeManager {
         return nodeMapper.findAll();
     }
 
-    public List<Node> findAllTypeContent(int currentPage, int itemsPerPage) {
-        int offset = (currentPage - 1) * itemsPerPage;
-        RowBounds rowBounds;
-        if(currentPage == 0){
-            rowBounds = new RowBounds();
-        } else {
-            rowBounds = new RowBounds(currentPage, itemsPerPage);
-        }
-        return nodeMapper.findAllTypeContentPageable(rowBounds);
+    public PaginationResult<List<Node>> findAllTypeContent(Pagination pagination) {
+        return new PaginationResult(
+                pagination.getOffset(),
+                pagination.getPageSize(),
+                (int) nodeMapper.count(),
+                nodeMapper.findAllTypeContentPaginated(pagination)
+        );
     }
 
     public List<Node> findAllByNodeId(List<Long> ids) {

@@ -31,7 +31,7 @@ public interface NodeMapper {
     @FilterAuthorized(resourceType = "feature:node", permissionType = PermissionType.READ)
     List<Node> findAllByParentIdPaginated(Long parentId, Pagination pagination);
 
-    List<Node> findAllTypeContentPageable(RowBounds rowbounds);
+    List<Node> findAllTypeContentPaginated(@Param("pagination") Pagination pagination);
 
     long countByParentId(Long parentId);
 
