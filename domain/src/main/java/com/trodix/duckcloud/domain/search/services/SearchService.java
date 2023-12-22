@@ -1,7 +1,7 @@
 package com.trodix.duckcloud.domain.search.services;
 
-import co.elastic.clients.elasticsearch._types.query_dsl.MatchQuery;
 import co.elastic.clients.elasticsearch._types.query_dsl.Query;
+import co.elastic.clients.elasticsearch._types.query_dsl.WildcardQuery;
 import com.trodix.duckcloud.domain.search.models.NodeIndex;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -34,9 +34,9 @@ public class SearchService {
         // 1. Create query with term conditions
         NativeQueryBuilder nativeQueryBuilder = new NativeQueryBuilder();
 
-        Query query = MatchQuery.of(m -> m
+        Query query = WildcardQuery.of(m -> m
                 .field(field)
-                .query((String) value)
+                .value((String) value + "*")
         )._toQuery();
 
         nativeQueryBuilder.withQuery(query);
