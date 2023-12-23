@@ -15,10 +15,8 @@ import org.apache.ibatis.session.RowBounds;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -190,6 +188,30 @@ public class NodeManager {
             }
         }
 
+    }
+
+    /**
+     * Get a string representation of the path of a node (the requested node is not part of the path)
+     * @param nodeId
+     * @return a string representation of the path of a node
+     */
+    public String getPath(long nodeId) {
+        List<List<String>> tree = buildTreeWithRecursiveParents(nodeId).stream().map(tn -> tn.getNodePath()).toList();
+        if (tree.isEmpty()) {
+            log.debug("tree has empty while getting path for nodeId {}", nodeId);
+            throw new RuntimeException("No path found for nodeId " + nodeId);
+        }
+        List<String> pathIds = tree.get(0);
+        List<Node> parentNodes = findAllByNodeId(pathIds.stream().map(p -> Long.valueOf(p)).toList());
+
+        String path = parentNodes.stream()
+                .filter(pathPart -> !pathPart.getId().equals(nodeId))
+                .map(n -> NodeUtils.getProperty(n.getProperties(), "cm:name").get().getStringVal())
+                .collect(Collectors.joining("/"));
+
+        log.debug("Path found for nodeId {}: \n{}", nodeId, path);
+
+        return path;
     }
 
 }

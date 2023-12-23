@@ -63,7 +63,7 @@
         <include refid="select_node" />
         WHERE n.id in (
             SELECT n.id FROM nodes n
-            WHERE t.name = 'cm:content'
+            WHERE ty.name = 'cm:content'
             OFFSET #{pagination.offset}
             LIMIT #{pagination.pageSize}
         )

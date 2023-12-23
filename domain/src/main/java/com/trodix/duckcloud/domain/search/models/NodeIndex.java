@@ -20,6 +20,8 @@ public class NodeIndex {
 
     private String type;
 
+    private String path;
+
     @MultiField(mainField = @Field(type = FieldType.Text))
     private List<String> tags;
 

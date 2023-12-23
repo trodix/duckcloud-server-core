@@ -1,5 +1,6 @@
 package com.trodix.duckcloud.domain.search.services;
 
+import com.trodix.duckcloud.domain.models.NodeWithPath;
 import com.trodix.duckcloud.domain.search.models.NodeIndex;
 import com.trodix.duckcloud.domain.services.NodeContentService;
 import com.trodix.duckcloud.domain.utils.ModelUtils;
@@ -22,6 +23,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -62,7 +64,16 @@ public class NodeIndexerService {
         for (int pageIndex = 0; pageIndex < pageCount; pageIndex++) {
             final PaginationResult<List<Node>> page = nodeManager.findAllTypeContent(new Pagination(BATCH_SIZE * pageIndex, BATCH_SIZE));
 
-            final List<NodeIndex> nodeIndexChunk = page.getEntries().stream().map(this::buildIndex).toList();
+            final List<NodeIndex> nodeIndexChunk = page.getEntries().stream()
+                    .map(entry -> {
+                        try {
+                            return buildIndex(entry);
+                        } catch (RuntimeException e) {
+                            return null;
+                        }
+                    })
+                    .filter(Objects::nonNull)
+                    .toList();
 
             final Runnable task = () -> createNodeIndexBulk(nodeIndexChunk);
             log.debug("Adding new task to thread pool with page {}/{} ({} records)", pageIndex + 1, pageCount, count);
@@ -119,10 +130,14 @@ public class NodeIndexerService {
     }
 
     public NodeIndex buildIndex(Node node) {
+
+        String path = nodeManager.getPath(node.getId());
+
         NodeIndex nodeIndex = new NodeIndex();
 
         nodeIndex.setDbId(node.getId());
         nodeIndex.setType(node.getType().getName());
+        nodeIndex.setPath(path);
         nodeIndex.setTags(NodeUtils.tagsToNameList(node.getTags()));
         nodeIndex.setProperties(NodeUtils.toMapProperties(node.getProperties()));
 
