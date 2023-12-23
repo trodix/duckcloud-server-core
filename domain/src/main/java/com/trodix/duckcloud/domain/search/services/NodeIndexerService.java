@@ -69,6 +69,7 @@ public class NodeIndexerService {
                         try {
                             return buildIndex(entry);
                         } catch (RuntimeException e) {
+                            log.warn("Node {} can't be indexed: {}", entry.getId(), e.getMessage());
                             return null;
                         }
                     })
