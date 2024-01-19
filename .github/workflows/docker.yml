@@ -27,6 +27,17 @@ jobs:
         with:
           java-version: '17'
           distribution: 'adopt'
+      - name: Setup Maven settings.xml
+        uses: whelk-io/maven-settings-xml-action@v20
+        with:
+          servers: >
+            [
+              {
+                "id": "github",
+                "username": "trodix",
+                "password": "${{ secrets.MAVEN_TOKEN }}"
+              }
+            ]
 
       - name: Package
         run: mvn -B clean package -DskipTests
