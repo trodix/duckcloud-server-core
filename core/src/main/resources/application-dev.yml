@@ -34,6 +34,7 @@ casbin:
       token-uri: "http://trodix.local:8080/realms/market/protocol/openid-connect/token"
 
 app:
+  elasticsearch-url: "localhost:9200"
   client:
     registration:
       name: market

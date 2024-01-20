@@ -29,7 +29,7 @@ public interface NodeMapper {
     List<Node> findAllByParentId(Long parentId);
 
     @FilterAuthorized(resourceType = "feature:node", permissionType = PermissionType.READ)
-    List<Node> findAllByParentIdPaginated(Long parentId, Pagination pagination);
+    List<Node> findAllByParentIdPaginated(@Param("parentId") Long parentId, @Param("pagination") Pagination pagination);
 
     List<Node> findAllTypeContentPaginated(@Param("pagination") Pagination pagination);
 
