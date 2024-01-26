@@ -34,11 +34,10 @@ app:
       fixed-delay: 120 # Delay in minutes
     file-content-indexer:
       enabled: true # Enable fulltext search on file contents
-  onlyoffice:
-    jwt:
-      secret: ""
-  server:
-    public-base-url: "http://trodix.local:8010"
+
+onlyoffice:
+  jwt-secret: ""
+  app-server-base-url: "http://trodix.local:8010"
 
 casbin:
   model: classpath:casbin/model.conf

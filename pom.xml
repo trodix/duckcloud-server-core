@@ -42,8 +42,6 @@
 		<module>domain</module>
 		<module>presentation</module>
 		<module>security</module>
-		<module>connectors</module>
-		<module>connectors-onlyoffice</module>
     </modules>
 
     <properties>
@@ -56,6 +54,7 @@
 		<tika-parsers.version>1.17</tika-parsers.version>
 		<keycloak.version>21.1.1</keycloak.version>
 		<testcontainers.version>1.18.3</testcontainers.version>
+		<onlyoffice-starter.version>1.0.0-SNAPSHOT</onlyoffice-starter.version>
 	</properties>
 
 	<dependencies>
@@ -133,6 +132,12 @@
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-aop</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>com.trodix.onlyoffice</groupId>
+			<artifactId>onlyoffice-spring-boot-starter</artifactId>
+			<version>${onlyoffice-starter.version}</version>
 		</dependency>
 
 	</dependencies>

@@ -29,11 +29,6 @@
             <artifactId>presentation</artifactId>
             <version>${project.parent.version}</version>
         </dependency>
-        <dependency>
-            <groupId>com.trodix.duckcloud.connectors</groupId>
-            <artifactId>connectors</artifactId>
-            <version>${project.parent.version}</version>
-        </dependency>
 
         <dependency>
             <groupId>org.testcontainers</groupId>

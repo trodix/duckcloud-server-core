@@ -61,7 +61,7 @@
         <logger name="com.trodix.duckcloud.security.services.PermissionService" level="INFO" />
         <logger name="com.trodix.casbinserver.annotations" level="INFO" />
         <logger name="com.trodix.duckcloud.security.persistance" level="INFO" />
-        <logger name="com.trodix.duckcloud.connectors.onlyoffice" level="DEBUG" />
+        <logger name="com.trodix.onlyoffice" level="DEBUG" />
 
     </springProfile>
 
