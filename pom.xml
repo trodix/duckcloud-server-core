@@ -31,8 +31,12 @@
 
 	<repositories>
 		<repository>
-			<id>github</id>
+			<id>github-1</id>
 			<url>https://maven.pkg.github.com/trodix/casbin-server</url>
+		</repository>
+		<repository>
+			<id>github-2</id>
+			<url>https://maven.pkg.github.com/trodix/onlyoffice-spring-boot-starter</url>
 		</repository>
 	</repositories>
 
