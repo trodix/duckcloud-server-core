@@ -31,9 +31,19 @@ jobs:
         uses: whelk-io/maven-settings-xml-action@v20
         with:
           servers: >
-            [
+            [          
               {
                 "id": "github",
+                "username": "trodix",
+                "password": "${{ secrets.MAVEN_TOKEN }}"
+              },
+              {
+                "id": "github-1",
+                "username": "trodix",
+                "password": "${{ secrets.MAVEN_TOKEN }}"
+              },
+              {
+                "id": "github-2",
                 "username": "trodix",
                 "password": "${{ secrets.MAVEN_TOKEN }}"
               }
