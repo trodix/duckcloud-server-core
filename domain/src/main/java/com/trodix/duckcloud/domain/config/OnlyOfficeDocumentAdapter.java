@@ -35,13 +35,13 @@ public class OnlyOfficeDocumentAdapter implements OnlyOfficeDocumentService {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Property: " + ContentModel.PROP_CREATED_AT + " not found for nodeId " + documentId));
 
         final Property modifiedAtProp = NodeUtils.getProperty(node.getProperties(), ContentModel.PROP_MODIFIED_AT)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Property: " + ContentModel.PROP_MODIFIED_AT + " not found for nodeId " + documentId));
+                .orElse(null);
 
         OfficeDocument document = new OfficeDocument();
         document.setId(node.getId().toString());
         document.setFileName(nameProp.getStringVal());
         document.setCreatedAt(createdAtProp.getDateVal());
-        document.setModifiedAt(modifiedAtProp.getDateVal());
+        document.setModifiedAt(modifiedAtProp == null ? null : modifiedAtProp.getDateVal());
 
         return document;
     }
