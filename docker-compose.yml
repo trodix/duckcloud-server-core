@@ -197,6 +197,15 @@ services:
     networks:
       - duckcloud-network
 
+
+  zipkin:
+    image: openzipkin/zipkin-slim:3
+    container_name: zipkin
+    environment:
+      - STORAGE_TYPE=mem
+    ports:
+      - 9411:9411
+
 networks:
   duckcloud-network:
     driver: bridge

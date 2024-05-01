@@ -88,6 +88,29 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-actuator</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>io.micrometer</groupId>
+			<artifactId>micrometer-tracing-bridge-brave</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>io.zipkin.reporter2</groupId>
+			<artifactId>zipkin-reporter-brave</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>io.zipkin.brave</groupId>
+			<artifactId>brave-instrumentation-spring-web</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>io.zipkin.brave</groupId>
+			<artifactId>brave-instrumentation-p6spy</artifactId>
+		</dependency>
+		<!-- https://mvnrepository.com/artifact/com.github.JokerLee-9527/brave-instrumentation-mybatis -->
+		<dependency>
+			<groupId>com.github.JokerLee-9527</groupId>
+			<artifactId>brave-instrumentation-mybatis</artifactId>
+			<version>1.0.1</version>
+		</dependency>
+
 
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
