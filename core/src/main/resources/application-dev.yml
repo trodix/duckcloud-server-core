@@ -40,7 +40,7 @@ app:
       name: market
       keycloak-admin-uri: http://trodix.local:8080/admin/realms/market
   auth:
-    allowed-origins: http://localhost:4200
+    allowed-origins: http://localhost:4200,http://localhost:63342
   storage:
     endpoint: http://127.0.0.1:9000
     accessKey: SykAM0TXTf3OVp5j

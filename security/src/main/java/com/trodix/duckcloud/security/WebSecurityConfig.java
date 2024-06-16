@@ -62,6 +62,8 @@ public class WebSecurityConfig {
                 .permitAll()
                 .and()
                 .authorizeHttpRequests()
+                .requestMatchers("/ws", "/app/**")
+                .permitAll()
                 .and()
                 .oauth2ResourceServer(
                         config -> config
