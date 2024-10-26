@@ -1,0 +1,2 @@
+CREATE USER casbin WITH PASSWORD 'casbin';
+CREATE DATABASE casbin OWNER casbin;

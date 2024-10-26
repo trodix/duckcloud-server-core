@@ -1,45 +1,14 @@
-version: '3.9'
-
 services:
   postgres:
     image: postgres:15.0
-    environment:
-      POSTGRES_DB: duckcloud
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
     ports:
       - "5434:5432"
+    command: bash -c "/database/docker-entrypoint.sh -c log_min_duration_statement=1000"
     networks:
       - duckcloud-network
     volumes:
       - duckcloud_postgres_data:/var/lib/postgresql/data
-
-  postgres_kc:
-    image: postgres:15.0
-    environment:
-      POSTGRES_DB: keycloak
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-    ports:
-      - "5432:5432"
-    networks:
-      - duckcloud-network
-    volumes:
-      - keycloak-demo_postgres_data:/var/lib/postgresql/data
-      - ./data/keycloak-demo/keycloak/db/:/docker-entrypoint-initdb.d/
-
-  postgres_casbin:
-    image: postgres:15.4
-    environment:
-      POSTGRES_DB: casbin
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-    ports:
-      - "5435:5432"
-    networks:
-      - duckcloud-network
-    volumes:
-      - casbin_postgres_data:/var/lib/postgresql/data
+      - ./database:/database/
 
   minio:
     image: minio/minio:RELEASE.2023-01-20T02-05-44Z.fips
@@ -94,40 +63,24 @@ services:
       KC_DB: postgres
       KC_DB_SCHEMA: public
       KC_DB_URL_DATABASE: keycloak
-      KC_DB_URL_HOST: postgres_kc
+      KC_DB_URL_HOST: postgres
       KC_DB_URL_PORT: 5432
-      KC_DB_USERNAME: postgres
-      KC_DB_PASSWORD: postgres
+      KC_DB_USERNAME: keycloak
+      KC_DB_PASSWORD: keycloak
       KEYCLOAK_ADMIN: admin
       KEYCLOAK_ADMIN_PASSWORD: admin
       KC_HOSTNAME_STRICT: "false"
       #KC_LOG_LEVEL: DEBUG
     ports:
       - 8080:8080
-    entrypoint: /opt/keycloak/bin/kc.sh start-dev
+    entrypoint: /opt/keycloak/bin/kc.sh start-dev --import-realm
     volumes:
       - ./keycloak/import:/opt/keycloak/data/import
     depends_on:
-      - postgres_kc
-      - openldap
+      - postgres
+#      - openldap
     networks:
       - duckcloud-network
-
-  openldap:
-    image: docker.io/bitnami/openldap:2.6
-    environment:
-      LDAP_ROOT: dc=trodix,dc=com
-      LDAP_ADMIN_USERNAME: admin
-      LDAP_ADMIN_PASSWORD: admin
-      LDAP_CUSTOM_LDIF_DIR: /ldifs
-    ports:
-      - 1389:1389
-      - 1636:1636
-    networks:
-      - duckcloud-network
-    volumes:
-      - openldap_data:/bitnami/openldap
-      - ./ldap/bootstrap:/ldifs
 
   smtp4dev:
     image: rnwood/smtp4dev:v3
@@ -145,9 +98,9 @@ services:
     environment:
       SPRING_PROFILES_ACTIVE: prod
       SPRING_DATASOURCE_DRIVERCLASSNAME: org.postgresql.Driver
-      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres_casbin:5432/casbin
-      SPRING_DATASOURCE_USERNAME: postgres
-      SPRING_DATASOURCE_PASSWORD: postgres
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/casbin
+      SPRING_DATASOURCE_USERNAME: casbin
+      SPRING_DATASOURCE_PASSWORD: casbin
       SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUERURI: http://trodix.local:8080/realms/market
       SPRING_SECURITY_OAUTH2_CLIENT_PROVIDER_MARKET_TOKENURI: http://trodix.local:8080/realms/market/protocol/openid-connect/token
       SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_MARKET_AUTHORIZATIONGRANTTYPE: client_credentials
@@ -203,13 +156,9 @@ networks:
 
 volumes:
   duckcloud_postgres_data:
-  keycloak-demo_postgres_data:
-  casbin_postgres_data:
   elasticsearch_data:
   kibana_data:
-  openldap_data:
   smtp4dev-data:
-  onlyoffice_postgresql_data:
   DocumentServer_log:
   DocumentServer_data:
   DocumentServer_lib_oo:
