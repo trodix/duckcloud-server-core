@@ -2,7 +2,8 @@ package com.trodix.duckcloud.security.utils;
 
 public enum Claims {
     EMAIL("email"),
-    NAME("name"),;
+    NAME("name"),
+    USERNAME("preferred_username"),;
 
     public final String value;
 

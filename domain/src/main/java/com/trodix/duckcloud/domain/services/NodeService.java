@@ -254,7 +254,7 @@ public class NodeService {
 
         final Property createdByDisplayNameProp = new Property();
         createdByDisplayNameProp.setPropertyName(ContentModel.PROP_CREATED_BY_DISPLAY_NAME);
-        createdByDisplayNameProp.setStringVal(authenticationService.getName());
+        createdByDisplayNameProp.setStringVal(authenticationService.getFullName());
 
         NodeUtils.addProperty(node, createdAtProp);
         NodeUtils.addProperty(node, createdByProp);
@@ -264,7 +264,7 @@ public class NodeService {
     public void setModifiedAuthorProperties(Node node) {
 
         String userId = authenticationService.getUserId();
-        String userName = authenticationService.getName();
+        String userName = authenticationService.getFullName();
 
         userId = userId == null ? AuthenticationService.DEFAULT_USER : userId;
         userName = userName == null ? AuthenticationService.DEFAULT_USER : userName;

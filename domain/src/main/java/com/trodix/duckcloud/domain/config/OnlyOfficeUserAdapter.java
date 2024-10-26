@@ -24,7 +24,7 @@ public class OnlyOfficeUserAdapter implements OnlyOfficeUserService {
 
     @Override
     public String getName() {
-        return authenticationService.getName();
+        return authenticationService.getFullName();
     }
 
     @Override
@@ -35,6 +35,7 @@ public class OnlyOfficeUserAdapter implements OnlyOfficeUserService {
         representation.setId(keycloakRep.getId());
         representation.setEmail(keycloakRep.getEmail());
         representation.setUsername(keycloakRep.getUsername());
+        representation.setFirstName(keycloakRep.getFirstName());
         representation.setLastName(keycloakRep.getLastName());
 
         return representation;

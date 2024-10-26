@@ -38,7 +38,11 @@ public class AuthenticationService {
         return getJwt().getSubject();
     }
 
-    public String getName() {
+    public String getUserName() {
+        return getJwt().getClaim(Claims.USERNAME.value);
+    }
+
+    public String getFullName() {
         return getJwt().getClaim(Claims.NAME.value);
     }
 

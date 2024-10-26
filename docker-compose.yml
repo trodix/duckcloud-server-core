@@ -114,7 +114,7 @@ services:
 ### OnlyOffice server services below
 
   onlyoffice-documentserver:
-    image: onlyoffice/documentserver:8.0.1.1
+    image: onlyoffice/documentserver:8.2
     container_name: onlyoffice-documentserver
     depends_on:
       - onlyoffice-rabbitmq
