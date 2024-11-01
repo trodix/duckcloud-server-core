@@ -116,11 +116,7 @@ services:
   onlyoffice-documentserver:
     image: onlyoffice/documentserver:8.2
     container_name: onlyoffice-documentserver
-    depends_on:
-      - onlyoffice-rabbitmq
     environment:
-      - AMQP_URI=amqp://guest:guest@onlyoffice-rabbitmq
-      # Uncomment strings below to enable the JSON Web Token validation.
       - JWT_ENABLED=true
       - JWT_SECRET=WlEJf7hdzCEGwTWkO89i
       - JWT_HEADER=Authorization
@@ -138,15 +134,6 @@ services:
       - DocumentServer_lib_postgresql:/var/lib/postgresql
     extra_hosts:
       - "host.docker.internal:host-gateway"
-    networks:
-      - duckcloud-network
-
-  onlyoffice-rabbitmq:
-    container_name: onlyoffice-rabbitmq
-    image: rabbitmq
-    #restart: always
-    expose:
-      - '5672'
     networks:
       - duckcloud-network
 
