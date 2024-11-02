@@ -84,6 +84,32 @@
         <addUniqueConstraint tableName="properties" columnNames="node_id, property_name" constraintName="property_name_ix1" />
     </changeSet>
 
+    <changeSet id="create-node_content-table" author="svallet">
+        <createTable tableName="node_content">
+            <column name="node_id" type="BIGINT">
+                <constraints nullable="false" foreignKeyName="fk_node_content_nodes" references="nodes(id)" />
+            </column>
+            <column name="content_path" type="VARCHAR">
+                <constraints nullable="false" unique="true" uniqueConstraintName="content_path_ix1" />
+            </column>
+            <column name="content_size" type="BIGINT">
+                <constraints nullable="false" />
+            </column>
+            <column name="content_version" type="NUMERIC" defaultValue="1.0">
+                <constraints nullable="false" />
+            </column>
+            <column name="created_at" type="TIMESTAMP">
+                <constraints nullable="false" />
+            </column>
+            <column name="created_by" type="VARCHAR">
+                <constraints nullable="false" />
+            </column>
+        </createTable>
+
+        <addUniqueConstraint tableName="node_content" columnNames="node_id, content_version" constraintName="node_id_content_version_ix1" />
+        <sql>ALTER TABLE node_content ADD CONSTRAINT content_version_gt_0_chk CHECK (content_version > 0);</sql>
+    </changeSet>
+
     <changeSet id="add-default-types" author="svallet">
         <loadData file="db/changelog/1.0/data/app_types_1.0.csv" separator=";" tableName="types">
             <column header="name" name="name" type="STRING"/>

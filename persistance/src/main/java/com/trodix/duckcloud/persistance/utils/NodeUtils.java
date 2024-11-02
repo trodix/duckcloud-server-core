@@ -16,11 +16,11 @@ public class NodeUtils {
         if (tags == null) {
             return new ArrayList<>();
         }
-        return tags.stream().map(p -> p.getName()).toList();
+        return tags.stream().map(Tag::getName).toList();
     }
 
     public static List<String> propertiesToNameList(List<Property> properties) {
-        return properties.stream().map(p -> p.getPropertyName()).toList();
+        return properties.stream().map(Property::getPropertyName).toList();
     }
 
     public static Optional<Property> getProperty(List<Property> properties, String propName) {
@@ -31,11 +31,11 @@ public class NodeUtils {
     }
 
     public static boolean hasProperty(List<Property> properties, String propName) {
-        return properties.stream().filter(p -> p.getPropertyName().equals(propName)).findAny().isPresent();
+        return properties.stream().anyMatch(p -> p.getPropertyName().equals(propName));
     }
 
     public static boolean hasProperty(Node node, String propName) {
-        return node.getProperties().stream().filter(p -> p.getPropertyName().equals(propName)).findAny().isPresent();
+        return node.getProperties().stream().anyMatch(p -> p.getPropertyName().equals(propName));
     }
 
     public static void addProperties(Node node, List<Property> properties) {
@@ -73,9 +73,9 @@ public class NodeUtils {
         if (p1.getStringVal() != null && p2.getStringVal() != null) {
             return p1.getStringVal().equals(p2.getStringVal());
         } else if (p1.getLongVal() != null && p2.getLongVal() != null) {
-            return p1.getLongVal() == p2.getLongVal();
+            return p1.getLongVal().equals(p2.getLongVal());
         } else if (p1.getDoubleVal() != null && p2.getDoubleVal() != null) {
-            return p1.getDoubleVal() == p2.getDoubleVal();
+            return p1.getDoubleVal().equals(p2.getDoubleVal());
         } else if (p1.getDateVal() != null && p2.getDateVal() != null) {
             return p1.getDateVal() == p2.getDateVal();
         }

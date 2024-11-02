@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.trodix.duckcloud.persistance.dao.mappers.NodeContentMapper">
+
+    <resultMap id="result_NodeContent" type="NodeContent">
+        <result property="nodeId" column="nc_node_id" jdbcType="BIGINT" javaType="java.lang.Long" />
+        <result property="contentPath" column="nc_content_path" jdbcType="VARCHAR" javaType="java.lang.String" />
+        <result property="contentSize" column="nc_content_size" jdbcType="BIGINT" javaType="java.lang.Long" />
+        <result property="contentVersion" column="nc_content_version" jdbcType="NUMERIC" javaType="java.lang.Float" />
+        <result property="createdAt" column="nc_created_at" jdbcType="TIMESTAMP" javaType="java.time.OffsetDateTime" />
+        <result property="createdBy" column="nc_created_by" jdbcType="VARCHAR" javaType="java.lang.String" />
+    </resultMap>
+
+    <sql id="fields_NodeContent">
+        nc.node_id as nc_node_id, nc.content_path as nc_content_path, nc.content_size as nc_content_size,
+        nc.content_version as nc_content_version, nc.created_at as nc_created_at, nc.created_by as nc_created_by
+    </sql>
+
+    <sql id="select_NodeContent">
+        SELECT <include refid="fields_NodeContent" /> FROM node_content nc
+    </sql>
+
+    <select id="findByNodeId" resultMap="result_NodeContent">
+        <include refid="select_NodeContent" />
+        WHERE nc.node_id = #{nodeId}
+    </select>
+
+    <select id="findByNodeIdAndVersion" resultMap="result_NodeContent">
+        <include refid="select_NodeContent" />
+        WHERE nc.node_id = #{nodeId} AND nc.content_version = #{contentVersion}::NUMERIC
+    </select>
+
+    <insert id="insert">
+        INSERT INTO node_content
+        (
+            node_id, content_path, content_size, content_version, created_at, created_by
+        )
+        VALUES
+        (
+            #{nodeId}, #{contentPath}, #{contentSize}, #{contentVersion}, #{createdAt}, #{createdBy}
+        )
+    </insert>
+
+    <delete id="deleteAllByNodeId">
+        DELETE FROM node_content WHERE node_id = #{nodeId}
+    </delete>
+
+    <delete id="deleteByNodeIdAndVersion">
+        DELETE FROM node_content WHERE node_id = #{nodeId} AND content_version = #{contentVersion}
+    </delete>
+
+</mapper>

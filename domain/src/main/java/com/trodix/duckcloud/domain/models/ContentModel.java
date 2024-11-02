@@ -12,11 +12,11 @@ public class ContentModel {
 
     public static final String TYPE_CONTENT = getName("content");
 
-    public static final String PROP_BUCKET = getName("bucket");
-
     public static final String PROP_CONTENT_LOCATION = getName("contentLocation");
 
     public static final String PROP_CONTENT_SIZE = getName("contentSize");
+
+    public static final String PROP_CONTENT_VERSION = getName("contentVersion");
 
     public static final String PROP_NAME = getName("name");
 

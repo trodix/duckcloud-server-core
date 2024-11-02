@@ -1,18 +1,18 @@
 package com.trodix.duckcloud.presentation.controllers;
 
+import com.trodix.casbinserver.annotations.Authorization;
 import com.trodix.casbinserver.models.PermissionType;
 import com.trodix.duckcloud.domain.models.ContentModel;
 import com.trodix.duckcloud.domain.models.FileStoreMetadata;
 import com.trodix.duckcloud.domain.services.NodeService;
 import com.trodix.duckcloud.domain.services.StorageService;
 import com.trodix.duckcloud.persistance.entities.Node;
+import com.trodix.duckcloud.persistance.entities.NodeContent;
 import com.trodix.duckcloud.persistance.utils.NodeUtils;
 import com.trodix.duckcloud.presentation.dto.mappers.NodeMapper;
 import com.trodix.duckcloud.presentation.dto.requests.NodeWithContentRequest;
-import com.trodix.casbinserver.annotations.Authorization;
 import io.minio.messages.Bucket;
 import io.swagger.v3.oas.annotations.Operation;
-import jakarta.annotation.security.RolesAllowed;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -60,18 +60,17 @@ public class StorageController {
 
     }
 
-    @Operation(summary = "Update a file attached to a node")
+    @Operation(summary = "Update a file attached to a node. Minor version by default")
     @PutMapping(path = "/nodes/{nodeId}/content", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
     @Authorization(resourceType = "feature:node", permissionType = PermissionType.WRITE)
-    public void create(@PathVariable final Long nodeId, @RequestPart(value = "file") final MultipartFile file) throws IOException {
-
+    public void update(@PathVariable final Long nodeId, @RequestPart(value = "file") final MultipartFile file) throws IOException {
+        // TODO: queryParam majorVersion=true|false or 2 distinct endpoints
         final Node node = nodeService.getOne(nodeId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Node not found for id " + nodeId));
         FileStoreMetadata fileStoreMetadata = nodeService.buildFileStoreMetadata(node, file);
         nodeService.updateNodeContent(node, fileStoreMetadata, file.getBytes());
-
     }
 
-    @Operation(summary = "Get the content of the latest version of the file attached to the node")
+    @Operation(summary = "Get the content of the current version of the file attached to the node")
     @GetMapping("/nodes/{nodeId}/content")
     @Authorization(resourceType = "feature:node", permissionType = PermissionType.READ)
     public ResponseEntity<ByteArrayResource> getNodeContentById(@PathVariable final Long nodeId) {
@@ -90,6 +89,21 @@ public class StorageController {
                 .header("Content-type", "application/octet-stream")
                 .header("Content-disposition", "attachment; filename=\"" + filename + "\"")
                 .body(resource);
+    }
+
+    @Operation(summary = "Restore a content version")
+    @PostMapping(path = "/nodes/{nodeId}/versions/{version}")
+    @Authorization(resourceType = "feature:node", permissionType = PermissionType.WRITE)
+    public void restoreVersion(@PathVariable final Long nodeId, @PathVariable final float version) {
+        Node node = nodeService.getOne(nodeId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Node not found for id " + nodeId));
+        nodeService.restoreVersion(node, version);
+    }
+
+    @Operation(summary = "List all content versions for a node")
+    @GetMapping(path = "/nodes/{nodeId}/versions")
+    @Authorization(resourceType = "feature:node", permissionType = PermissionType.WRITE)
+    public List<NodeContent> listVersions(@PathVariable final Long nodeId) {
+        return nodeService.listVersions(nodeId);
     }
 
 }

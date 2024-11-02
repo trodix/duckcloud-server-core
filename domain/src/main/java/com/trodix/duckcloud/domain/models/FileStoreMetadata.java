@@ -13,6 +13,8 @@ public class FileStoreMetadata {
 
     private String contentType;
 
+    private float contentVersion = 1.0f;
+
     private String originalName;
 
 }

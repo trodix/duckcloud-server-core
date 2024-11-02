@@ -75,6 +75,7 @@ public class OnlyOfficeDocumentAdapter implements OnlyOfficeDocumentService {
         fileStoreMetadata.setUuid(documentId);
         fileStoreMetadata.setBucket(parts.getBucket());
         fileStoreMetadata.setOriginalName(documentName);
+        fileStoreMetadata.setDirectoryPath(parts.getDirectoryPath());
 
         nodeService.updateNodeContent(node, fileStoreMetadata, content);
     }

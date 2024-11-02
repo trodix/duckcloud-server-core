@@ -18,12 +18,11 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.OffsetDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -167,8 +166,17 @@ public class NodeService {
         }
 
         createContentForNode(node, fileStoreMetadata, file);
-
         create(node);
+
+        NodeContent nodeContent = new NodeContent();
+        nodeContent.setNodeId(node.getId());
+        Optional<Property> contentLocationProp = NodeUtils.getProperty(node.getProperties(), ContentModel.PROP_CONTENT_LOCATION);
+        nodeContent.setContentPath(contentLocationProp.orElse(new Property()).getStringVal());
+        nodeContent.setContentSize(Long.valueOf(file.length));
+        nodeContent.setContentVersion(fileStoreMetadata.getContentVersion());
+        nodeContent.setCreatedAt(OffsetDateTime.now());
+        nodeContent.setCreatedBy(authenticationService.getUserId());
+        nodeContentService.insert(nodeContent);
     }
 
     private void createContentForNode(Node node, FileStoreMetadata fileStoreMetadata, byte[] file) {
@@ -188,14 +196,54 @@ public class NodeService {
         contentSize.setLongVal(Long.valueOf(file.length));
         NodeUtils.addProperty(node, contentSize);
 
+        Property contentVersion = new Property();
+        contentVersion.setPropertyName(ContentModel.PROP_CONTENT_VERSION);
+        contentVersion.setStringVal(Float.toString(fileStoreMetadata.getContentVersion()));
+        NodeUtils.addProperty(node, contentVersion);
+
         Property fileName = new Property();
         fileName.setPropertyName(ContentModel.PROP_NAME);
         fileName.setStringVal(fileStoreMetadata.getOriginalName());
         NodeUtils.addProperty(node, fileName);
     }
 
-    public void updateNodeContent(Node node, FileStoreMetadata fileStoreMetadata, byte[] file) {
+    public void restoreVersion(Node node, float version) {
+        NodeContent nodeContent = nodeContentService.findByNodeIdAndVersion(node.getId(), version)
+                .orElseThrow(() -> new IllegalArgumentException("Version " + version + " not found for nodeId " + node.getId()));
 
+        Property contentLocation = new Property();
+        contentLocation.setPropertyName(ContentModel.PROP_CONTENT_LOCATION);
+        contentLocation.setStringVal(nodeContent.getContentPath());
+        NodeUtils.addProperty(node, contentLocation);
+
+        Property contentSize = new Property();
+        contentSize.setPropertyName(ContentModel.PROP_CONTENT_SIZE);
+        contentSize.setLongVal(Long.valueOf(nodeContent.getContentSize()));
+        NodeUtils.addProperty(node, contentSize);
+
+        Property contentVersion = new Property();
+        contentVersion.setPropertyName(ContentModel.PROP_CONTENT_VERSION);
+        contentVersion.setStringVal(Float.toString(nodeContent.getContentVersion()));
+        NodeUtils.addProperty(node, contentVersion);
+
+        update(node);
+    }
+
+    public List<NodeContent> listVersions(Long nodeId) {
+        return nodeContentService.findByNodeId(nodeId);
+    }
+
+    public void updateNodeContent(Node node, FileStoreMetadata fileStoreMetadata, byte[] file) {
+        fileStoreMetadata.setContentVersion(nodeContentService.getNextMinorVersion(node));
+        updateNodeContentInternal(node, fileStoreMetadata, file);
+    }
+
+    public void updateNodeContentMajorVersion(Node node, FileStoreMetadata fileStoreMetadata, byte[] file) {
+        fileStoreMetadata.setContentVersion(nodeContentService.getNextMajorVersion(node));
+        updateNodeContentInternal(node, fileStoreMetadata, file);
+    }
+
+    private void updateNodeContentInternal(Node node, FileStoreMetadata fileStoreMetadata, byte[] file) {
         if (!ModelUtils.isContentType(node)) {
             throw new IllegalArgumentException("Node should be of type " + ContentModel.TYPE_CONTENT);
         }
@@ -204,16 +252,20 @@ public class NodeService {
             throw new IllegalArgumentException("Property " + ContentModel.PROP_NAME + " was not found");
         }
 
-        Optional<Property> optionalContentLocation = NodeUtils.getProperty(node.getProperties(), ContentModel.PROP_CONTENT_LOCATION);
-
-        if (optionalContentLocation.isPresent()) {
-            String contentLocation = optionalContentLocation.get().getStringVal();
-            FileLocationParts contentLocationParts = StorageUtils.getFileLocationParts(contentLocation);
-            storageService.deleteFile(contentLocationParts.getBucket(), contentLocationParts.getPath());
-        }
-
+        fileStoreMetadata.setDirectoryPath(null); // don't reuse the last file version path
+        fileStoreMetadata.setUuid(null); // create a new file in storage
         createContentForNode(node, fileStoreMetadata, file);
         update(node);
+
+        NodeContent nodeContent = new NodeContent();
+        nodeContent.setNodeId(node.getId());
+        Optional<Property> contentLocationProp = NodeUtils.getProperty(node.getProperties(), ContentModel.PROP_CONTENT_LOCATION);
+        nodeContent.setContentPath(contentLocationProp.orElse(new Property()).getStringVal());
+        nodeContent.setContentSize(Long.valueOf(file.length));
+        nodeContent.setContentVersion(fileStoreMetadata.getContentVersion());
+        nodeContent.setCreatedAt(OffsetDateTime.now());
+        nodeContent.setCreatedBy(authenticationService.getUserId());
+        nodeContentService.insert(nodeContent);
     }
 
     public void update(Node node) {
@@ -286,6 +338,8 @@ public class NodeService {
         NodeUtils.addProperty(node, modifiedByDisplayNameProp);
     }
 
+
+    @Transactional
     public void delete(Long id) {
 
         Node node = getOne(id).orElseThrow(() -> new IllegalArgumentException("Node with id " + id + " not found"));
@@ -296,6 +350,7 @@ public class NodeService {
             if (contentLocation.isPresent()) {
                 FileLocationParts fileLocationParts = StorageUtils.getFileLocationParts(contentLocation.get().getStringVal());
                 storageService.deleteFile(fileLocationParts.getBucket(), fileLocationParts.getPath());
+                nodeContentService.deleteAllByNodeId(node.getId());
             }
 
         }
@@ -318,17 +373,10 @@ public class NodeService {
 
     public FileStoreMetadata buildFileStoreMetadata(Node node, MultipartFile file) {
         FileStoreMetadata metadata = new FileStoreMetadata();
-        metadata.setContentType(file.getContentType());
-
-        Optional<Property> bucket = NodeUtils.getProperty(node.getProperties(), ContentModel.PROP_BUCKET);
-        if (bucket.isPresent()) {
-            metadata.setBucket(bucket.get().getStringVal());
-        } else {
-            metadata.setBucket(null);
-        }
-
+        metadata.setBucket(null);
         metadata.setDirectoryPath(null);
         metadata.setUuid(null);
+        metadata.setContentType(file.getContentType());
         metadata.setOriginalName(file.getOriginalFilename());
 
         return metadata;
