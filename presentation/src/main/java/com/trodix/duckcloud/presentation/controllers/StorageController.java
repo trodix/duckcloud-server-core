@@ -1,5 +1,6 @@
 package com.trodix.duckcloud.presentation.controllers;
 
+import com.trodix.casbinserver.annotations.AuthResourceId;
 import com.trodix.casbinserver.annotations.Authorization;
 import com.trodix.casbinserver.models.PermissionType;
 import com.trodix.duckcloud.domain.models.ContentModel;
@@ -63,7 +64,7 @@ public class StorageController {
     @Operation(summary = "Update a file attached to a node. Minor version by default")
     @PutMapping(path = "/nodes/{nodeId}/content", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
     @Authorization(resourceType = "feature:node", permissionType = PermissionType.WRITE)
-    public void update(@PathVariable final Long nodeId, @RequestPart(value = "file") final MultipartFile file) throws IOException {
+    public void update(@PathVariable @AuthResourceId final Long nodeId, @RequestPart(value = "file") final MultipartFile file) throws IOException {
         // TODO: queryParam majorVersion=true|false or 2 distinct endpoints
         final Node node = nodeService.getOne(nodeId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Node not found for id " + nodeId));
         FileStoreMetadata fileStoreMetadata = nodeService.buildFileStoreMetadata(node, file);
@@ -73,7 +74,7 @@ public class StorageController {
     @Operation(summary = "Get the content of the current version of the file attached to the node")
     @GetMapping("/nodes/{nodeId}/content")
     @Authorization(resourceType = "feature:node", permissionType = PermissionType.READ)
-    public ResponseEntity<ByteArrayResource> getNodeContentById(@PathVariable final Long nodeId) {
+    public ResponseEntity<ByteArrayResource> getNodeContentById(@PathVariable @AuthResourceId final Long nodeId) {
 
         Node node = nodeService.getOne(nodeId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Node not found for id " + nodeId));
 
@@ -94,15 +95,15 @@ public class StorageController {
     @Operation(summary = "Restore a content version")
     @PostMapping(path = "/nodes/{nodeId}/versions/{version}")
     @Authorization(resourceType = "feature:node", permissionType = PermissionType.WRITE)
-    public void restoreVersion(@PathVariable final Long nodeId, @PathVariable final float version) {
+    public void restoreVersion(@PathVariable @AuthResourceId final Long nodeId, @PathVariable final float version) {
         Node node = nodeService.getOne(nodeId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Node not found for id " + nodeId));
         nodeService.restoreVersion(node, version);
     }
 
     @Operation(summary = "List all content versions for a node")
     @GetMapping(path = "/nodes/{nodeId}/versions")
-    @Authorization(resourceType = "feature:node", permissionType = PermissionType.WRITE)
-    public List<NodeContent> listVersions(@PathVariable final Long nodeId) {
+    @Authorization(resourceType = "feature:node", permissionType = PermissionType.READ)
+    public List<NodeContent> listVersions(@PathVariable @AuthResourceId final Long nodeId) {
         return nodeService.listVersions(nodeId);
     }
 
