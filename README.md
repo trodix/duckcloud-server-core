@@ -2,7 +2,7 @@
 
 ## File explorer
 
-<img src="./docs/images/file_explorer_1.png"/>
+<img src="./docs/images/document_list.png"/>
 
 ## Search API
 

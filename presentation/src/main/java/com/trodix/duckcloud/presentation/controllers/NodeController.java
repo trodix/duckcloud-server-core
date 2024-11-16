@@ -108,12 +108,7 @@ public class NodeController {
         final Node destination = nodeService.getOne(request.getDestinationId())
                 .orElseThrow(() -> new HttpClientErrorException(HttpStatus.NOT_FOUND, "Destination node not found with id " + request.getDestinationId()));
 
-        if (!ModelUtils.isDirectoryType(destination)) {
-            throw new IllegalArgumentException("Destination node must be of type " + ContentModel.TYPE_DIRECTORY);
-        }
-
-        source.setParentId(destination.getId());
-        nodeService.update(source);
+        nodeService.move(source, destination);
     }
 
     @DeleteMapping("/{id}")

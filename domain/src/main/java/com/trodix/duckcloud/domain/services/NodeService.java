@@ -295,6 +295,19 @@ public class NodeService {
         indexNode(existingNode);
     }
 
+    public void move(Node source, Node destination) {
+        if (!ModelUtils.isDirectoryType(destination)) {
+            throw new IllegalArgumentException("Destination node must be of type " + ContentModel.TYPE_DIRECTORY);
+        }
+
+        if (destination.getId().equals(source.getId())) {
+            throw new IllegalArgumentException("Can't move node into itself");
+        }
+
+        source.setParentId(destination.getId());
+        update(source);
+    }
+
     public void setCreatedAuthorProperties(Node node) {
         final Property createdAtProp = new Property();
         createdAtProp.setPropertyName(ContentModel.PROP_CREATED_AT);
